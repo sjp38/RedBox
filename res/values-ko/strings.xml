@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RedBox</string>
+    <string name="number_input_hint">Block 할 전화번호를 입력하세요.</string>
+    <string name="from_contact_button">연락처에서..</string>
+    <string name="from_call_log_button">Call log 에서..</string>
+    <string name="add_number_button">추가</string>
+    <string name="delete_blocked_menu">Block 한 번호 삭제</string>
+    <string name="delete_unblocked_menu">Block 안한 번호 삭제</string>
+    <string name="duplicate_number">같은 번호가 이미 목록에 존재합니다.</string>
+    <string name="wait_next_update">작업 중입니다. 다음 update 를 기다려 주세요 ;)</string>
+</resources>
