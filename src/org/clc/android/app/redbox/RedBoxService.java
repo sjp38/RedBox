@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -122,23 +124,29 @@ public class RedBoxService extends Service {
             @Override
             public void handleMessage(Message msg) {
                 String number = (String) msg.obj;
+                Uri callLogUri = CallLog.Calls.CONTENT_URI;
+                String querySelection = CallLog.Calls.NUMBER + "=" + number;
+                if (Build.MODEL.equals("SHW-M250S") || Build.MODEL.equals("SHW-M250K")) {
+                    callLogUri = Uri.parse("content://logs/call");
+                    querySelection = null;
+                    
+                }
                 Cursor cursor = getContentResolver().query(
-                        CallLog.Calls.CONTENT_URI, CALL_PROJECTION,
-                        CallLog.Calls.NUMBER + "=" + number, null,
+                        callLogUri, CALL_PROJECTION,
+                        querySelection, null,
                         CallLog.Calls.DEFAULT_SORT_ORDER);
-                String result = null;
                 if (cursor.getCount() > 0 && cursor.moveToFirst()) {
                     int id = cursor.getInt(cursor
                             .getColumnIndex(CallLog.Calls._ID));
                     long date = cursor.getLong(cursor
-                            .getColumnIndex(CallLog.Calls.DATE));
+                            .getColumnIndex(CallLog.Calls.DATE));                    
                     // If not recently created log, don't delete.
                     if (System.currentTimeMillis() - date > RECENT_CALL_LOG_JUDGE_CRITERIA) {
                         if (msg.arg1++ < CALL_LOG_CREATION_WAIT_TRY_LIMIT) {
                             sendMessageDelayed(msg, CALL_LOG_CREATION_WAIT_TIME);
                         }
                     } else {
-                        getContentResolver().delete(CallLog.Calls.CONTENT_URI,
+                        getContentResolver().delete(callLogUri,
                                 CallLog.Calls._ID + "=" + Integer.toString(id),
                                 null);
                     }
