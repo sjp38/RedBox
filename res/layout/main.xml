@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <EditText android:layout_height="wrap_content"
+        android:hint="@string/number_input_hint" android:layout_width="match_parent"
+        android:id="@+id/number_input_textView" android:inputType="phone">
+        <requestFocus></requestFocus>
+    </EditText>
+    <LinearLayout android:id="@+id/linearLayout1"
+        android:layout_width="match_parent" android:layout_height="wrap_content">
+        <Button android:text="@string/from_contact_button"
+            android:layout_height="wrap_content" android:layout_weight="1"
+            android:id="@+id/get_number_from_contacts_button"
+            android:layout_width="0dp" android:onClick="onGetNumberFromContactsClicked"></Button>
+        <Button android:text="@string/from_call_log_button"
+            android:layout_height="wrap_content" android:layout_weight="1"
+            android:id="@+id/get_number_from_call_log_button"
+            android:layout_width="0dp" android:onClick="onGetNumberFromCallLogClicked"></Button>
+        <Button android:text="@string/add_number_button"
+            android:layout_height="wrap_content" android:layout_weight="1"
+            android:id="@+id/add_number_button" android:layout_width="0dp"
+            android:onClick="onAddNumberClicked"></Button>
+    </LinearLayout>
+    <ListView android:id="@+id/numbersList"
+        android:scrollbarStyle="outsideOverlay" android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

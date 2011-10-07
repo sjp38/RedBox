@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RedBox</string>
+    <string name="number_input_hint">Insert number you want to block.</string>
+    <string name="from_contact_button">From contact</string>
+    <string name="from_call_log_button">From call log</string>
+    <string name="add_number_button">Add number</string>
+    <string name="delete_blocked_menu">Delete blocked numbers</string>
+    <string name="delete_unblocked_menu">Delete unblocked numbers</string>
+    <string name="duplicate_number">Same number already exist in list.</string>
+    <string name="wait_next_update">Still working. Please wait for next update, or contribute ;)</string>
+</resources>
