@@ -50,7 +50,7 @@ public class RedBoxService extends Service {
         public void onCallStateChanged(int state, String incomingNumber) {
             if (state == TelephonyManager.CALL_STATE_RINGING) {
                 for (String blockedNumber : mBlockedNumbers) {
-                    if (incomingNumber.equals(blockedNumber)) {
+                    if (incomingNumber.matches(blockedNumber)) {
                         ban(incomingNumber);
                     }
                 }
