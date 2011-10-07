@@ -8,7 +8,7 @@
         <requestFocus></requestFocus>
     </EditText>
     <LinearLayout android:id="@+id/linearLayout1"
-        android:layout_width="match_parent" android:layout_height="wrap_content">
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:baselineAligned="false">
         <Button android:text="@string/from_contact_button"
             android:layout_height="wrap_content" android:layout_weight="1"
             android:id="@+id/get_number_from_contacts_button"
