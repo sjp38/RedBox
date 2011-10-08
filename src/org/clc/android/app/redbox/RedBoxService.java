@@ -125,25 +125,29 @@ public class RedBoxService extends Service {
             public void handleMessage(Message msg) {
                 String number = (String) msg.obj;
                 Uri callLogUri = CallLog.Calls.CONTENT_URI;
-                String querySelection = CallLog.Calls.NUMBER + "=" + number;
-                if (Build.MODEL.equals("SHW-M250S") || Build.MODEL.equals("SHW-M250K")) {
+                String querySelection = CallLog.Calls.NUMBER + "='" + number + "'";
+                if (Build.MODEL.equals("SHW-M250S")
+                        || Build.MODEL.equals("SHW-M250K")) {
                     callLogUri = Uri.parse("content://logs/call");
                     querySelection = null;
-                    
                 }
-                Cursor cursor = getContentResolver().query(
-                        callLogUri, CALL_PROJECTION,
-                        querySelection, null,
+                Cursor cursor = getContentResolver().query(callLogUri,
+                        CALL_PROJECTION, querySelection, null,
                         CallLog.Calls.DEFAULT_SORT_ORDER);
+
                 if (cursor.getCount() > 0 && cursor.moveToFirst()) {
                     int id = cursor.getInt(cursor
                             .getColumnIndex(CallLog.Calls._ID));
                     long date = cursor.getLong(cursor
-                            .getColumnIndex(CallLog.Calls.DATE));                    
+                            .getColumnIndex(CallLog.Calls.DATE));
                     // If not recently created log, don't delete.
                     if (System.currentTimeMillis() - date > RECENT_CALL_LOG_JUDGE_CRITERIA) {
                         if (msg.arg1++ < CALL_LOG_CREATION_WAIT_TRY_LIMIT) {
-                            sendMessageDelayed(msg, CALL_LOG_CREATION_WAIT_TIME);
+                            Message newMsg = new Message();
+                            newMsg.what = msg.what;
+                            newMsg.arg1 = msg.arg1;
+                            newMsg.obj = msg.obj;
+                            sendMessageDelayed(newMsg, CALL_LOG_CREATION_WAIT_TIME);
                         }
                     } else {
                         getContentResolver().delete(callLogUri,
