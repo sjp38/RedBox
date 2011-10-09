@@ -8,7 +8,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,6 +33,8 @@ public class RedBoxActivity extends Activity {
 
     private static final int OPTION_MENU_DELETE_BLOCKED = 1;
     private static final int OPTION_MENU_DELETE_UNBLOCKED = 2;
+
+    private static final int PICK_CONTACT_REQUEST = 1;
 
     private ListView mNumbersListView = null;
     private NumbersListAdapter mAdapter = null;
@@ -95,9 +100,60 @@ public class RedBoxActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case PICK_CONTACT_REQUEST:
+                if (resultCode != Activity.RESULT_OK) {
+                    Toast.makeText(this, R.string.error_while_pick_contact,
+                            Toast.LENGTH_SHORT).show();
+                    return;
+
+                }
+                Uri contactData = data.getData();
+                Cursor cursor = managedQuery(contactData, null, null, null,
+                        null);
+                if (!cursor.moveToFirst()) {
+                    return;
+                }
+                while (true) {
+                    String contactId = cursor.getString(cursor
+                            .getColumnIndex(ContactsContract.Contacts._ID));
+                    String hasPhone = cursor
+                            .getString(cursor
+                                    .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+
+                    if (hasPhone.equalsIgnoreCase("1")) {
+                        Cursor phones = getContentResolver()
+                                .query(
+                                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                        null,
+                                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID
+                                                + " = " + contactId, null, null);
+                        while (phones.moveToNext()) {
+                            String phoneNumber = phones
+                                    .getString(phones
+                                            .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                            addNumber(phoneNumber);
+                        }
+                        phones.close();
+                    }
+                    if (!cursor.moveToNext()) {
+                        break;
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+
+    }
+
     public void onGetNumberFromContactsClicked(View v) {
-        Toast.makeText(this, R.string.wait_next_update, Toast.LENGTH_SHORT)
-                .show();
+        Intent pickContactIntent = new Intent(Intent.ACTION_PICK,
+                ContactsContract.Contacts.CONTENT_URI);
+        startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
     }
 
     public void onGetNumberFromCallLogClicked(View v) {
@@ -105,9 +161,7 @@ public class RedBoxActivity extends Activity {
                 .show();
     }
 
-    public void onAddNumberClicked(View v) {
-        EditText textView = (EditText) findViewById(R.id.number_input_textView);
-        String number = textView.getText().toString();
+    private void addNumber(String number) {
         if (mPreferences.contains(number)) {
             Toast.makeText(this, R.string.duplicate_number, Toast.LENGTH_SHORT)
                     .show();
@@ -117,6 +171,12 @@ public class RedBoxActivity extends Activity {
         editor.putBoolean(number, true);
         editor.commit();
         mAdapter.notifyDataSetChanged();
+    }
+
+    public void onAddNumberClicked(View v) {
+        EditText textView = (EditText) findViewById(R.id.number_input_textView);
+        String number = textView.getText().toString();
+        addNumber(number);
     }
 
     public class NumberData {
