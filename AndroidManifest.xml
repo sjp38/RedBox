@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.clc.android.app.redbox" android:versionCode="1"
-    android:versionName="0.5.0">
+    package="org.clc.android.app.redbox" android:versionCode="1" android:versionName="0.5.2">
     <uses-sdk android:minSdkVersion="8" />
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />

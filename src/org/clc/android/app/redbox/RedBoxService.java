@@ -107,7 +107,7 @@ public class RedBoxService extends Service {
         }
     }
 
-    private static final String[] CALL_PROJECTION = { CallLog.Calls._ID,
+    public static final String[] CALL_PROJECTION = { CallLog.Calls._ID,
             CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.DURATION };
 
     private static final int DEL_CALL_LOG_MESSAGE = 1;

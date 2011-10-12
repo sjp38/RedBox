@@ -5,12 +5,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.CallLog;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -80,9 +84,9 @@ public class RedBoxActivity extends Activity {
 
         menu
                 .add(0, OPTION_MENU_DELETE_BLOCKED, 0,
-                        R.string.delete_blocked_menu);
+                        R.string.menu_delete_blocked);
         menu.add(0, OPTION_MENU_DELETE_UNBLOCKED, 0,
-                R.string.delete_unblocked_menu);
+                R.string.menu_delete_unblocked);
 
         return true;
     }
@@ -100,6 +104,35 @@ public class RedBoxActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void showNumberSelectionDialog(final CharSequence[] numbers) {
+        final boolean[] checked = new boolean[numbers.length];
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.title_select_number);
+        builder.setMultiChoiceItems(numbers, null,
+                new DialogInterface.OnMultiChoiceClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which,
+                            boolean isChecked) {
+                        checked[which] = isChecked;
+                    }
+                });
+        builder.setPositiveButton(R.string.add_number_button,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        for (int i = 0; i < numbers.length; i++) {
+                            if (checked[i]) {
+                                addNumber(numbers[i].toString());
+                            }
+                        }
+                    }
+                });
+        builder.create().show();
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -111,37 +144,40 @@ public class RedBoxActivity extends Activity {
                     return;
 
                 }
-                Uri contactData = data.getData();
-                Cursor cursor = managedQuery(contactData, null, null, null,
-                        null);
-                if (!cursor.moveToFirst()) {
-                    return;
-                }
-                while (true) {
-                    String contactId = cursor.getString(cursor
+                final Cursor cursor = managedQuery(data.getData(), null, null,
+                        null, null);
+                boolean numberExist = false;
+                while (cursor.moveToNext()) {
+                    final String contactId = cursor.getString(cursor
                             .getColumnIndex(ContactsContract.Contacts._ID));
-                    String hasPhone = cursor
+                    final String hasPhone = cursor
                             .getString(cursor
                                     .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
                     if (hasPhone.equalsIgnoreCase("1")) {
-                        Cursor phones = getContentResolver()
+                        numberExist = true;
+                        final Cursor phones = getContentResolver()
                                 .query(
                                         ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                                         null,
                                         ContactsContract.CommonDataKinds.Phone.CONTACT_ID
                                                 + " = " + contactId, null, null);
+
+                        final CharSequence[] phoneNumbers = new CharSequence[phones
+                                .getCount()];
                         while (phones.moveToNext()) {
-                            String phoneNumber = phones
+                            phoneNumbers[phones.getPosition()] = phones
                                     .getString(phones
                                             .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                            addNumber(phoneNumber);
                         }
                         phones.close();
+                        showNumberSelectionDialog(phoneNumbers);
                     }
-                    if (!cursor.moveToNext()) {
-                        break;
-                    }
+                }
+                cursor.close();
+                if (!numberExist) {
+                    Toast.makeText(this, R.string.error_blank_contact,
+                            Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
@@ -157,14 +193,30 @@ public class RedBoxActivity extends Activity {
     }
 
     public void onGetNumberFromCallLogClicked(View v) {
-        Toast.makeText(this, R.string.wait_next_update, Toast.LENGTH_SHORT)
-                .show();
+        Uri callLogUri = CallLog.Calls.CONTENT_URI;
+        if (Build.MODEL.equals("SHW-M250S") || Build.MODEL.equals("SHW-M250K")) {
+            callLogUri = Uri.parse("content://logs/call");
+        }
+        final Cursor cursor = getContentResolver().query(callLogUri,
+                RedBoxService.CALL_PROJECTION, null, null,
+                CallLog.Calls.DEFAULT_SORT_ORDER + " LIMIT 20");
+        final CharSequence[] numbers = new CharSequence[cursor.getCount()];
+        while (cursor.moveToNext()) {
+            numbers[cursor.getPosition()] = cursor.getString(cursor
+                    .getColumnIndex(CallLog.Calls.NUMBER));
+        }
+        cursor.close();
+        this.showNumberSelectionDialog(numbers);
     }
 
     private void addNumber(String number) {
+        if ("".equals(number)) {
+            Toast.makeText(this, R.string.error_blank_number,
+                    Toast.LENGTH_SHORT).show();
+        }
         if (mPreferences.contains(number)) {
-            Toast.makeText(this, R.string.duplicate_number, Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(this, R.string.error_duplicate_number,
+                    Toast.LENGTH_SHORT).show();
             return;
         }
         SharedPreferences.Editor editor = mPreferences.edit();
@@ -176,6 +228,7 @@ public class RedBoxActivity extends Activity {
     public void onAddNumberClicked(View v) {
         EditText textView = (EditText) findViewById(R.id.number_input_textView);
         String number = textView.getText().toString();
+        textView.setText("");
         addNumber(number);
     }
 

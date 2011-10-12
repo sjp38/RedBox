@@ -5,9 +5,12 @@
     <string name="from_contact_button">From contact</string>
     <string name="from_call_log_button">From call log</string>
     <string name="add_number_button">Add number</string>
-    <string name="delete_blocked_menu">Delete blocked numbers</string>
-    <string name="delete_unblocked_menu">Delete unblocked numbers</string>
-    <string name="duplicate_number">Same number already exist in list.</string>
+    <string name="menu_delete_blocked">Delete blocked numbers</string>
+    <string name="menu_delete_unblocked">Delete unblocked numbers</string>
+    <string name="error_duplicate_number">Same number already exist in list.</string>
     <string name="wait_next_update">Still working. Please wait for next update, or contribute ;)</string>
     <string name="error_while_pick_contact">Error while pick contact.</string>
+    <string name="error_blank_number">Blank number can\'t be added.</string>
+    <string name="title_select_number">Select numbers to add.</string>
+    <string name="error_blank_contact">Selected contact has no phone number.</string>
 </resources>
