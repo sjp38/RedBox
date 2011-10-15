@@ -1,27 +1,26 @@
 package org.clc.android.app.redbox;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Map.Entry;
+
+import org.clc.android.app.redbox.data.BlockSetting;
+import org.clc.android.app.redbox.data.DataManager;
+import org.clc.android.app.redbox.data.DataManager.OnBlockSettingChangeListener;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -31,31 +30,60 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
-public class RedBoxActivity extends Activity {
-    public static final String DATA_PATH = "numbers";
+public class RedBoxActivity extends Activity implements
+        OnBlockSettingChangeListener {
     private static final String TAG = "RedBox";
 
-    private static final int OPTION_MENU_DELETE_BLOCKED = 1;
-    private static final int OPTION_MENU_DELETE_UNBLOCKED = 2;
+    public static final String ID = "id";
 
     private static final int PICK_CONTACT_REQUEST = 1;
 
     private ListView mNumbersListView = null;
     private NumbersListAdapter mAdapter = null;
     private LayoutInflater mLayoutInflater = null;
-    private SharedPreferences mPreferences = null;
 
-    private OnCheckedChangeListener mNumberCheckChangeListener = new OnCheckedChangeListener() {
+    private OnClickListener mNumberClickListener = new OnClickListener() {
         @Override
-        public void onCheckedChanged(CompoundButton buttonView,
-                boolean isChecked) {
-            View parent = (View) buttonView.getParent();
-            TextView numberView = (TextView) parent
-                    .findViewById(R.id.number_textview);
-            String number = numberView.getText().toString();
-            SharedPreferences.Editor editor = mPreferences.edit();
-            editor.putBoolean(number, isChecked);
-            editor.commit();
+        public void onClick(View v) {
+            final View parent = (View) v.getParent();
+            final int id = parent.getId();
+
+            Intent blockSettingIntent = new Intent();
+            blockSettingIntent.setClass(RedBoxActivity.this,
+                    RedBoxBlockSettingActivity.class);
+            blockSettingIntent.putExtra(ID, id);
+
+            RedBoxActivity.this.startActivity(blockSettingIntent);
+
+        }
+    };
+
+    private OnCheckedChangeListener mRejectCallCheckChangeListener = new OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton view, boolean isChecked) {
+            final View parent = (View) view.getParent();
+            final int id = parent.getId();
+            DataManager.getInstance().setRejectCall(id, isChecked);
+        }
+    };
+
+    private OnCheckedChangeListener mRemoveCallLogCheckChangeListener = new OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton view, boolean isChecked) {
+            final View parent = (View) view.getParent();
+            final int id = parent.getId();
+            DataManager.getInstance().setDeleteCallLog(id, isChecked);
+        }
+    };
+
+    private OnCheckedChangeListener mSendAutoSMSCheckChangeListener = new OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton view, boolean isChecked) {
+            final View parent = (View) view.getParent();
+            final int id = parent.getId();
+            BlockSetting setting = DataManager.getInstance()
+                    .getBlockSetting(id);
+            DataManager.getInstance().setSendAutoSMS(id, isChecked, null);
         }
     };
 
@@ -65,46 +93,25 @@ public class RedBoxActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        mPreferences = getSharedPreferences(DATA_PATH, MODE_PRIVATE);
-
         mNumbersListView = (ListView) findViewById(R.id.numbersList);
 
         mAdapter = new NumbersListAdapter();
         mNumbersListView.setAdapter(mAdapter);
 
-        mAdapter.bindDatas();
-
         Context context = getApplicationContext();
         context.startService(new Intent(context, RedBoxService.class));
+
+        DataManager.getInstance().setOnBlockSettingChangeListener(this);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-
-        menu
-                .add(0, OPTION_MENU_DELETE_BLOCKED, 0,
-                        R.string.menu_delete_blocked);
-        menu.add(0, OPTION_MENU_DELETE_UNBLOCKED, 0,
-                R.string.menu_delete_unblocked);
-
-        return true;
+    public void onPause() {
+        super.onPause();
+        DataManager.getInstance().saveSettings();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case OPTION_MENU_DELETE_BLOCKED:
-                mAdapter.deleteNumbers(true);
-                return true;
-            case OPTION_MENU_DELETE_UNBLOCKED:
-                mAdapter.deleteNumbers(false);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void showNumberSelectionDialog(final CharSequence[] numbers) {
+    private void showNumberSelectionDialog(final String name,
+            final CharSequence[] numbers) {
         final boolean[] checked = new boolean[numbers.length];
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -125,7 +132,7 @@ public class RedBoxActivity extends Activity {
                     public void onClick(DialogInterface dialog, int which) {
                         for (int i = 0; i < numbers.length; i++) {
                             if (checked[i]) {
-                                addNumber(numbers[i].toString());
+                                addNumber(name, numbers[i].toString());
                             }
                         }
                     }
@@ -148,6 +155,9 @@ public class RedBoxActivity extends Activity {
                         null, null);
                 boolean numberExist = false;
                 while (cursor.moveToNext()) {
+                    final String name = cursor
+                            .getString(cursor
+                                    .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
                     final String contactId = cursor.getString(cursor
                             .getColumnIndex(ContactsContract.Contacts._ID));
                     final String hasPhone = cursor
@@ -171,7 +181,7 @@ public class RedBoxActivity extends Activity {
                                             .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                         }
                         phones.close();
-                        showNumberSelectionDialog(phoneNumbers);
+                        showNumberSelectionDialog(name, phoneNumbers);
                     }
                 }
                 cursor.close();
@@ -206,22 +216,22 @@ public class RedBoxActivity extends Activity {
                     .getColumnIndex(CallLog.Calls.NUMBER));
         }
         cursor.close();
-        this.showNumberSelectionDialog(numbers);
+        this.showNumberSelectionDialog("", numbers);
     }
 
-    private void addNumber(String number) {
+    private void addNumber(String alias, String number) {
         if ("".equals(number)) {
             Toast.makeText(this, R.string.error_blank_number,
                     Toast.LENGTH_SHORT).show();
+            return;
         }
-        if (mPreferences.contains(number)) {
+        if (DataManager.getInstance().isExist(number)) {
             Toast.makeText(this, R.string.error_duplicate_number,
                     Toast.LENGTH_SHORT).show();
             return;
         }
-        SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putBoolean(number, true);
-        editor.commit();
+        BlockSetting setting = new BlockSetting(alias, number);
+        DataManager.getInstance().add(setting);
         mAdapter.notifyDataSetChanged();
     }
 
@@ -229,31 +239,25 @@ public class RedBoxActivity extends Activity {
         EditText textView = (EditText) findViewById(R.id.number_input_textView);
         String number = textView.getText().toString();
         textView.setText("");
-        addNumber(number);
+        addNumber("", number);
     }
 
-    public class NumberData {
-        NumberData(String number, boolean enabled) {
-            mNumber = number;
-            mEnabled = enabled;
-        }
-
-        public String mNumber;
-        public boolean mEnabled;
+    @Override
+    public void onBlockSettingsChanged() {
+        mAdapter.notifyDataSetChanged();
     }
 
     private class NumbersListAdapter extends BaseAdapter {
-        ArrayList<NumberData> mNumbers = null;
-
         NumbersListAdapter() {
             super();
-            mNumbers = new ArrayList<NumberData>();
             mLayoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         @Override
         public int getCount() {
-            return mNumbers.size();
+            final ArrayList<BlockSetting> settings = DataManager.getInstance()
+                    .getBlockSettings();
+            return settings.size();
         }
 
         @Override
@@ -265,25 +269,46 @@ public class RedBoxActivity extends Activity {
             } else {
                 numberList = convertView;
             }
+            numberList.setId(position);
+            TextView alias = (TextView) numberList
+                    .findViewById(R.id.alias_textview);
             TextView number = (TextView) numberList
                     .findViewById(R.id.number_textview);
-            CheckBox checkBox = (CheckBox) numberList
-                    .findViewById(R.id.number_enabled_checkBox);
+            CheckBox rejectCallCheckBox = (CheckBox) numberList
+                    .findViewById(R.id.reject_call_checkBox);
+            CheckBox removeCallLogCheckBox = (CheckBox) numberList
+                    .findViewById(R.id.remove_call_log_checkBox);
+            CheckBox sendAutoSMSCheckBox = (CheckBox) numberList
+                    .findViewById(R.id.send_auto_sms_checkBox);
 
-            NumberData data = (NumberData) getItem(position);
-            number.setText(data.mNumber);
-            checkBox.setChecked(data.mEnabled);
-            checkBox.setOnCheckedChangeListener(mNumberCheckChangeListener);
+            View aliasNumberLayout = numberList
+                    .findViewById(R.id.aliasNumberLayout);
+            aliasNumberLayout.setOnClickListener(mNumberClickListener);
 
+            BlockSetting setting = DataManager.getInstance().getBlockSetting(
+                    position);
+            if (setting.mAlias.equals("")) {
+                alias.setText(setting.mNumber);
+                number.setText("");
+            } else {
+                alias.setText(setting.mAlias);
+                number.setText(setting.mNumber);
+            }
+            rejectCallCheckBox.setChecked(setting.mRejectCall);
+            rejectCallCheckBox
+                    .setOnCheckedChangeListener(mRejectCallCheckChangeListener);
+            removeCallLogCheckBox.setChecked(setting.mDeleteCallLog);
+            removeCallLogCheckBox
+                    .setOnCheckedChangeListener(mRemoveCallLogCheckChangeListener);
+            sendAutoSMSCheckBox.setChecked(setting.mSendAutoSMS);
+            sendAutoSMSCheckBox
+                    .setOnCheckedChangeListener(mSendAutoSMSCheckChangeListener);
             return numberList;
         }
 
         @Override
         public Object getItem(int position) {
-            if (mNumbers.size() > position) {
-                return mNumbers.get(position);
-            }
-            return null;
+            return DataManager.getInstance().getBlockSetting(position);
         }
 
         @Override
@@ -293,34 +318,21 @@ public class RedBoxActivity extends Activity {
 
         @Override
         public void notifyDataSetChanged() {
-            bindDatas();
             super.notifyDataSetChanged();
         }
 
-        private void bindDatas() {
-            if (mPreferences == null) {
-                Log.e(TAG, "mPreferences is null! maybe not opened yet!!");
-                return;
-            }
-            mNumbers.clear();
-            Map<String, ?> datas = mPreferences.getAll();
-            for (Entry<String, ?> entry : datas.entrySet()) {
-                NumberData data = new NumberData(entry.getKey(),
-                        (Boolean) entry.getValue());
-                mNumbers.add(data);
-            }
-        }
-
         private void deleteNumbers(boolean blocked) {
-            SharedPreferences.Editor editor = mPreferences.edit();
-            Map<String, ?> datas = mPreferences.getAll();
-
-            for (Entry<String, ?> entry : datas.entrySet()) {
-                if ((Boolean) entry.getValue() == blocked) {
-                    editor.remove(entry.getKey());
+            final ArrayList<BlockSetting> deleteSettings = new ArrayList<BlockSetting>();
+            final ArrayList<BlockSetting> settings = DataManager.getInstance()
+                    .getBlockSettings();
+            for (BlockSetting setting : settings) {
+                if (setting.mRejectCall == blocked) {
+                    deleteSettings.add(setting);
                 }
             }
-            editor.commit();
+            for (BlockSetting deleteSetting : deleteSettings) {
+                DataManager.getInstance().delete(deleteSetting);
+            }
             notifyDataSetChanged();
         }
     }

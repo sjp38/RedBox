@@ -2,14 +2,14 @@ package org.clc.android.app.redbox;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.HashMap;
+
+import org.clc.android.app.redbox.data.BlockSetting;
+import org.clc.android.app.redbox.data.DataManager;
 
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -18,43 +18,57 @@ import android.os.IBinder;
 import android.os.Message;
 import android.provider.CallLog;
 import android.telephony.PhoneStateListener;
+import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.android.internal.telephony.ITelephony;
 
-public class RedBoxService extends Service {
+public class RedBoxService extends Service implements
+        DataManager.OnBlockSettingChangeListener {
     private static final String TAG = "RedBox_service";
 
-    private ArrayList<String> mBlockedNumbers = null;
+    HashMap<String, BlockSetting> mSettings = null;
 
-    private void readBlockedNumbersFromPrefs(SharedPreferences prefs) {
-        mBlockedNumbers.clear();
-        Map<String, ?> datas = prefs.getAll();
-        for (Entry<String, ?> entry : datas.entrySet()) {
-            if ((Boolean) entry.getValue()) {
-                mBlockedNumbers.add(entry.getKey());
-            }
+    private void setBlockSettingMap() {
+        if (mSettings == null) {
+            mSettings = new HashMap<String, BlockSetting>();
+        }
+        mSettings.clear();
+        final ArrayList<BlockSetting> settings = DataManager.getInstance()
+                .getBlockSettings();
+        for (BlockSetting setting : settings) {
+            String number = setting.mNumber;
+            number = number.replace("-", "");
+            number = number.replace("(", "");
+            number = number.replace(")", "");
+            mSettings.put(number, setting);
         }
     }
 
-    private OnSharedPreferenceChangeListener mPreferencesChangeListener = new OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(
-                SharedPreferences sharedPreferences, String key) {
-            readBlockedNumbersFromPrefs(sharedPreferences);
-        }
-    };
+    @Override
+    public void onBlockSettingsChanged() {
+        setBlockSettingMap();
+    }
 
     private PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
             if (state == TelephonyManager.CALL_STATE_RINGING) {
-                for (String blockedNumber : mBlockedNumbers) {
-                    if (incomingNumber.matches(blockedNumber)) {
-                        ban(incomingNumber);
-                    }
+                BlockSetting setting = mSettings.get(incomingNumber);
+                if (setting == null) {
+                    return;
+                }
+                Toast.makeText(getApplicationContext(), "Block!", Toast.LENGTH_SHORT).show();
+                if (setting.mRejectCall) {
+                    endCall();
+                }
+                if (setting.mDeleteCallLog) {
+                    deleteCallLog(incomingNumber);
+                }
+                if (setting.mSendAutoSMS) {
+                    sendSMS(incomingNumber, setting.mAutoSMS);
                 }
             }
         }
@@ -63,14 +77,8 @@ public class RedBoxService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        mBlockedNumbers = new ArrayList<String>();
 
-        SharedPreferences prefs = getSharedPreferences(
-                RedBoxActivity.DATA_PATH, MODE_PRIVATE);
-        prefs
-                .registerOnSharedPreferenceChangeListener(mPreferencesChangeListener);
-        readBlockedNumbersFromPrefs(prefs);
-
+        DataManager.getInstance().setOnBlockSettingChangeListener(this);
         startPhoneStateMonitoring();
     }
 
@@ -125,7 +133,8 @@ public class RedBoxService extends Service {
             public void handleMessage(Message msg) {
                 String number = (String) msg.obj;
                 Uri callLogUri = CallLog.Calls.CONTENT_URI;
-                String querySelection = CallLog.Calls.NUMBER + "='" + number + "'";
+                String querySelection = CallLog.Calls.NUMBER + "='" + number
+                        + "'";
                 if (Build.MODEL.equals("SHW-M250S")
                         || Build.MODEL.equals("SHW-M250K")) {
                     callLogUri = Uri.parse("content://logs/call");
@@ -147,7 +156,8 @@ public class RedBoxService extends Service {
                             newMsg.what = msg.what;
                             newMsg.arg1 = msg.arg1;
                             newMsg.obj = msg.obj;
-                            sendMessageDelayed(newMsg, CALL_LOG_CREATION_WAIT_TIME);
+                            sendMessageDelayed(newMsg,
+                                    CALL_LOG_CREATION_WAIT_TIME);
                         }
                     } else {
                         getContentResolver().delete(callLogUri,
@@ -162,11 +172,8 @@ public class RedBoxService extends Service {
 
     }
 
-    private void ban(String incomingNumber) {
-        endCall();
-        deleteCallLog(incomingNumber);
-        Toast.makeText(getBaseContext(), "Block!!!", Toast.LENGTH_SHORT).show();
-
+    private void sendSMS(String number, String msg) {
+        SmsManager smsManager = SmsManager.getDefault();
+        smsManager.sendTextMessage(number, null, msg, null, null);
     }
-
 }

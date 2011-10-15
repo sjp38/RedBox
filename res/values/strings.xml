@@ -1,16 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Contact terminator</string>
-    <string name="number_input_hint">Insert number you want to block.</string>
+    <string name="number_input_hint">Insert number you want to control contact.
+    </string>
     <string name="from_contact_button">From contact</string>
     <string name="from_call_log_button">From call log</string>
     <string name="add_number_button">Add number</string>
-    <string name="menu_delete_blocked">Delete blocked numbers</string>
-    <string name="menu_delete_unblocked">Delete unblocked numbers</string>
+
     <string name="error_duplicate_number">Same number already exist in list.</string>
-    <string name="wait_next_update">Still working. Please wait for next update, or contribute ;)</string>
+    <string name="wait_next_update">Still working. Please wait for next update, or
+        contribute ;)</string>
     <string name="error_while_pick_contact">Error while pick contact.</string>
     <string name="error_blank_number">Blank number can\'t be added.</string>
     <string name="title_select_number">Select numbers to add.</string>
     <string name="error_blank_contact">Selected contact has no phone number.</string>
+
+    <string name="notify_will_reject_call">Will reject call from this number.</string>
+    <string name="notify_will_delte_call_log">Will delete call log from this number.</string>
+    <string name="notify_will_send_auto_sms">Will send Message when call comes from this
+        number.</string>
+    <string name="notify_will_not_reject_call">Will not reject call from this number.</string>
+    <string name="notify_will_not_delte_call_log">Will not delete call log from this number.
+    </string>
+    <string name="notify_will_not_send_auto_sms">Will not send Message when call comes from this
+        number.</string>
+
+    <string name="setting_alias_name_description">Alias and number pattern. Touch to change.
+    </string>
+    <string name="setting_reject_call_title">Reject call</string>
+    <string name="setting_reject_call_description">Reject call with this number.</string>
+    <string name="setting_delete_call_log_title">Delete call log</string>
+    <string name="setting_delete_call_log_description">If call comes from this number, delete that log.
+    </string>
+    <string name="setting_send_auto_sms_title">Send auto SMS</string>
+    <string name="setting_send_auto_sms_description">If call comes from this number, automatically
+        send SMS message.</string>
+    <string name="setting_hint_auto_sms_editfield">"Insert auto message. Ex) Sorry, I'm busy now. I
+        will call you soon."</string>
+    <string name="setting_button_save">Save</string>
+    <string name="setting_button_discard">Discard</string>
+    <string name="setting_button_delete">Delete</string>
+
+    <string name="setting_alias_dialog_title">Insert alias for this number pattern.</string>
+    <string name="setting_number_dialog_title">Insert number pattern which you want to manage.
+    </string>
+
+    <string name="dialog_positive_button">OK</string>
+    <string name="dialog_negative_button">Cancel</string>
 </resources>

@@ -1,16 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">연락 종결자</string>
-    <string name="number_input_hint">Block 할 전화번호를 입력하세요.</string>
+    <string name="number_input_hint">연락 설정을 할 전화번호를 입력하세요.</string>
     <string name="from_contact_button">연락처에서..</string>
     <string name="from_call_log_button">Call log 에서..</string>
     <string name="add_number_button">추가</string>
-    <string name="menu_delete_blocked">Block 한 번호 삭제</string>
-    <string name="menu_delete_unblocked">Block 안한 번호 삭제</string>
+
     <string name="error_duplicate_number">같은 번호가 이미 목록에 존재합니다.</string>
     <string name="warning_wait_next_update">작업 중입니다. 다음 update 를 기다려 주세요 ;)</string>
     <string name="error_while_pick_contact">Contact 정보를 가져오는 중 문제가 발생했습니다.</string>
     <string name="error_blank_number">빈 번호는 입력될 수 없습니다.</string>
     <string name="title_select_number">추가할 번호를 선택하세요.</string>
     <string name="error_blank_contact">선택하신 연락처에는 전화 번호가 존재하지 않습니다.</string>
+
+    <string name="notify_will_reject_call">이 번호로부터의 전화가 걸려오면 곧바로 끊습니다.</string>
+    <string name="notify_will_delte_call_log">이 번호로부터 전화가 걸려오면 해당 콜로그를 지웁니다.</string>
+    <string name="notify_will_send_auto_sms">이 번호로부터 전화가 걸려오면 자동으로 메세지를 보냅니다.</string>
+    <string name="notify_will_not_reject_call">이 번호로부터 전화가 걸려와도 끊지 않습니다.</string>
+    <string name="notify_will_not_delte_call_log">이 번호로부터 전화가 걸려와도 해당 콜로그를 지우지 않습니다.</string>
+    <string name="notify_will_not_send_auto_sms">이 번호로부터 전화가 걸려와도 자동으로 메세지를 보내지 않습니다.</string>
+
+    <string name="setting_alias_name_description">설정할 명칭과 번호입니다. 수정하시려면 터치하세요 .</string>
+    <string name="setting_reject_call_title">전화 끊기</string>
+    <string name="setting_reject_call_description">이 번호로부터 전화가 오면 곧바로 전화를 끊습니다.</string>
+    <string name="setting_delete_call_log_title">기록 삭제하기</string>
+    <string name="setting_delete_call_log_description">이 번호로부터 전화가 오면 곧바로 그 기록을 삭제합니다.</string>
+    <string name="setting_send_auto_sms_title">자동 문자 응답 보내기</string>
+    <string name="setting_send_auto_sms_description">이 번호로부터 전화가 오면 설정해둔 문자를 보냅니다.</string>
+    <string name="setting_hint_auto_sms_editfield">"자동 응답 메세지를 입력하세요. 예:죄송합니다, 회의 중입니다. 4시 이후 전화
+        드리겠습니다."</string>
+    <string name="setting_button_save">저장</string>
+    <string name="setting_button_discard">변경사항 취소</string>
+    <string name="setting_button_delete">삭제</string>
+
+    <string name="setting_alias_dialog_title">이 번호의 명칭을 입력하세요.</string>
+    <string name="setting_number_dialog_title">관리하실 번호 패턴을 입력하세요.</string>
+
+    <string name="dialog_positive_button">확인</string>
+    <string name="dialog_negative_button">취소</string>
 </resources>
