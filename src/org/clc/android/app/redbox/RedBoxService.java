@@ -56,6 +56,9 @@ public class RedBoxService extends Service implements
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
             if (state == TelephonyManager.CALL_STATE_RINGING) {
+                if (mSettings == null) {
+                    setBlockSettingMap();
+                }
                 BlockSetting setting = mSettings.get(incomingNumber);
                 if (setting == null) {
                     return;

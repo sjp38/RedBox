@@ -60,9 +60,12 @@ public class RedBoxBlockSettingActivity extends Activity implements
     private void showTextSettingDialog(final int title, final int id) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final EditText input = new EditText(this);
+        final TextView target = (TextView) findViewById(id);
+        final String writed = target.getText().toString();
         if (id == R.id.number_textView) {
             input.setInputType(InputType.TYPE_CLASS_PHONE);
         }
+        input.setText(writed);
         builder.setTitle(title);
         builder.setView(input);
         builder.setPositiveButton(R.string.dialog_positive_button,
@@ -77,9 +80,7 @@ public class RedBoxBlockSettingActivity extends Activity implements
                                     Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        final TextView alias = (TextView) RedBoxBlockSettingActivity.this
-                                .findViewById(id);
-                        alias.setText(text);
+                        target.setText(text);
                     }
                 });
         builder.setNegativeButton(R.string.dialog_negative_button,

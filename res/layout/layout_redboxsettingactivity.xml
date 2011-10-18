@@ -8,10 +8,10 @@
 
         <TextView android:layout_height="wrap_content"
             android:id="@+id/alias_textView" android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_width="match_parent"></TextView>
+            android:layout_width="match_parent" android:hint="@string/hint_setting_alias" />
         <TextView android:layout_height="wrap_content"
             android:id="@+id/number_textView" android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_width="match_parent"></TextView>
+            android:layout_width="match_parent" android:hint="@string/hint_setting_number" />
         <TextView android:text="@string/setting_alias_name_description"
             android:id="@+id/textView1" android:layout_width="wrap_content"
             android:layout_height="wrap_content"></TextView>
@@ -112,15 +112,18 @@
         android:id="@+id/linearLayout3" android:layout_width="match_parent"
         style="@android:style/ButtonBar" android:layout_gravity="bottom"
         android:baselineAligned="false">
-        <Button android:id="@+id/save"
-            android:layout_weight="1" android:text="@string/setting_button_save"
-            android:layout_width="0dp" android:onClick="onSaveButtonClicked" android:layout_height="match_parent"></Button>
-        <Button android:id="@+id/discard"
-            android:layout_weight="1" android:text="@string/setting_button_discard"
-            android:layout_width="0dp" android:onClick="onDiscardButtonClicked" android:layout_height="match_parent"></Button>
-        <Button android:id="@+id/delete"
-            android:layout_weight="1" android:text="@string/setting_button_delete"
-            android:layout_width="0dp" android:onClick="onDeleteButtonClicked" android:layout_height="match_parent"></Button>
+        <Button android:id="@+id/save" android:layout_weight="1"
+            android:text="@string/setting_button_save"
+            android:layout_width="0dp" android:onClick="onSaveButtonClicked"
+            android:layout_height="match_parent"></Button>
+        <Button android:id="@+id/discard" android:layout_weight="1"
+            android:text="@string/setting_button_discard"
+            android:layout_width="0dp" android:onClick="onDiscardButtonClicked"
+            android:layout_height="match_parent"></Button>
+        <Button android:id="@+id/delete" android:layout_weight="1"
+            android:text="@string/setting_button_delete"
+            android:layout_width="0dp" android:onClick="onDeleteButtonClicked"
+            android:layout_height="match_parent"></Button>
     </LinearLayout>
 
 

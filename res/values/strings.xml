@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Contact terminator</string>
-    <string name="number_input_hint">Insert number you want to control contact.
+    <string name="number_input_hint">Insert number.
     </string>
-    <string name="from_contact_button">From contact</string>
-    <string name="from_call_log_button">From call log</string>
-    <string name="add_number_button">Add number</string>
+
+    <string-array name="menu_list_phonenumber_edit_widget">
+        <item>Get number from contact</item>
+        <item>Get number from call log</item>
+    </string-array>
+
+    <string name="add_number_button">Add</string>
 
     <string name="error_duplicate_number">Same number already exist in list.</string>
     <string name="wait_next_update">Still working. Please wait for next update, or
@@ -35,8 +39,7 @@
     <string name="setting_send_auto_sms_title">Send auto SMS</string>
     <string name="setting_send_auto_sms_description">If call comes from this number, automatically
         send SMS message.</string>
-    <string name="setting_hint_auto_sms_editfield">"Insert auto message. Ex) Sorry, I'm busy now. I
-        will call you soon."</string>
+    <string name="setting_hint_auto_sms_editfield">"Insert auto message. Ex) Sorry, I'm busy now. I will call you soon."</string>
     <string name="setting_button_save">Save</string>
     <string name="setting_button_discard">Discard</string>
     <string name="setting_button_delete">Delete</string>
@@ -47,4 +50,7 @@
 
     <string name="dialog_positive_button">OK</string>
     <string name="dialog_negative_button">Cancel</string>
+
+    <string name="hint_setting_alias">Alias. Touch to edit.</string>
+    <string name="hint_setting_number">Number. Touch to edit.</string>
 </resources>

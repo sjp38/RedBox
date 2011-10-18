@@ -5,18 +5,12 @@ import java.util.ArrayList;
 import org.clc.android.app.redbox.data.BlockSetting;
 import org.clc.android.app.redbox.data.DataManager;
 import org.clc.android.app.redbox.data.DataManager.OnBlockSettingChangeListener;
+import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.CallLog;
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +18,6 @@ import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,11 +29,10 @@ public class RedBoxActivity extends Activity implements
 
     public static final String ID = "id";
 
-    private static final int PICK_CONTACT_REQUEST = 1;
-
     private ListView mNumbersListView = null;
     private NumbersListAdapter mAdapter = null;
     private LayoutInflater mLayoutInflater = null;
+    private PhoneNumberEditWidget mPhoneNumberInsertWidget = null;
 
     private OnClickListener mNumberClickListener = new OnClickListener() {
         @Override
@@ -98,6 +90,8 @@ public class RedBoxActivity extends Activity implements
         mAdapter = new NumbersListAdapter();
         mNumbersListView.setAdapter(mAdapter);
 
+        mPhoneNumberInsertWidget = (PhoneNumberEditWidget) findViewById(R.id.number_input_textView);
+
         Context context = getApplicationContext();
         context.startService(new Intent(context, RedBoxService.class));
 
@@ -110,124 +104,32 @@ public class RedBoxActivity extends Activity implements
         DataManager.getInstance().saveSettings();
     }
 
-    private void showNumberSelectionDialog(final String name,
-            final CharSequence[] numbers) {
-        final boolean[] checked = new boolean[numbers.length];
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.title_select_number);
-        builder.setMultiChoiceItems(numbers, null,
-                new DialogInterface.OnMultiChoiceClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which,
-                            boolean isChecked) {
-                        checked[which] = isChecked;
-                    }
-                });
-        builder.setPositiveButton(R.string.add_number_button,
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        for (int i = 0; i < numbers.length; i++) {
-                            if (checked[i]) {
-                                addNumber(name, numbers[i].toString());
-                            }
-                        }
-                    }
-                });
-        builder.create().show();
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case PICK_CONTACT_REQUEST:
-                if (resultCode != Activity.RESULT_OK) {
-                    Toast.makeText(this, R.string.error_while_pick_contact,
-                            Toast.LENGTH_SHORT).show();
-                    return;
-
-                }
-                final Cursor cursor = managedQuery(data.getData(), null, null,
-                        null, null);
-                boolean numberExist = false;
-                while (cursor.moveToNext()) {
-                    final String name = cursor
-                            .getString(cursor
-                                    .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                    final String contactId = cursor.getString(cursor
-                            .getColumnIndex(ContactsContract.Contacts._ID));
-                    final String hasPhone = cursor
-                            .getString(cursor
-                                    .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
-
-                    if (hasPhone.equalsIgnoreCase("1")) {
-                        numberExist = true;
-                        final Cursor phones = getContentResolver()
-                                .query(
-                                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                                        null,
-                                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID
-                                                + " = " + contactId, null, null);
-
-                        final CharSequence[] phoneNumbers = new CharSequence[phones
-                                .getCount()];
-                        while (phones.moveToNext()) {
-                            phoneNumbers[phones.getPosition()] = phones
-                                    .getString(phones
-                                            .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        }
-                        phones.close();
-                        showNumberSelectionDialog(name, phoneNumbers);
-                    }
-                }
-                cursor.close();
-                if (!numberExist) {
-                    Toast.makeText(this, R.string.error_blank_contact,
-                            Toast.LENGTH_SHORT).show();
-                }
+            case PhoneNumberEditWidget.PICK_CONTACT_REQUEST:
+                mPhoneNumberInsertWidget.onContactActivityResult(resultCode,
+                        data);
                 break;
             default:
                 break;
         }
-
     }
 
-    public void onGetNumberFromContactsClicked(View v) {
-        Intent pickContactIntent = new Intent(Intent.ACTION_PICK,
-                ContactsContract.Contacts.CONTENT_URI);
-        startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
-    }
-
-    public void onGetNumberFromCallLogClicked(View v) {
-        Uri callLogUri = CallLog.Calls.CONTENT_URI;
-        if (Build.MODEL.equals("SHW-M250S") || Build.MODEL.equals("SHW-M250K")) {
-            callLogUri = Uri.parse("content://logs/call");
-        }
-        final Cursor cursor = getContentResolver().query(callLogUri,
-                RedBoxService.CALL_PROJECTION, null, null,
-                CallLog.Calls.DEFAULT_SORT_ORDER + " LIMIT 20");
-        final CharSequence[] numbers = new CharSequence[cursor.getCount()];
-        while (cursor.moveToNext()) {
-            numbers[cursor.getPosition()] = cursor.getString(cursor
-                    .getColumnIndex(CallLog.Calls.NUMBER));
-        }
-        cursor.close();
-        this.showNumberSelectionDialog("", numbers);
-    }
-
-    private void addNumber(String alias, String number) {
+    private void addNumber(String alias, String number, boolean notify) {
         if ("".equals(number)) {
-            Toast.makeText(this, R.string.error_blank_number,
-                    Toast.LENGTH_SHORT).show();
+            if (notify) {
+                Toast.makeText(this, R.string.error_blank_number,
+                        Toast.LENGTH_SHORT).show();
+            }
             return;
         }
         if (DataManager.getInstance().isExist(number)) {
-            Toast.makeText(this, R.string.error_duplicate_number,
-                    Toast.LENGTH_SHORT).show();
+            if (notify) {
+                Toast.makeText(this, R.string.error_duplicate_number,
+                        Toast.LENGTH_SHORT).show();
+            }
             return;
         }
         BlockSetting setting = new BlockSetting(alias, number);
@@ -236,10 +138,11 @@ public class RedBoxActivity extends Activity implements
     }
 
     public void onAddNumberClicked(View v) {
-        EditText textView = (EditText) findViewById(R.id.number_input_textView);
-        String number = textView.getText().toString();
-        textView.setText("");
-        addNumber("", number);
+        final ArrayList<BlockSetting> settings = mPhoneNumberInsertWidget
+                .getBlockSettings();
+        for (BlockSetting setting : settings) {
+            addNumber(setting.mAlias, setting.mNumber, true);
+        }
     }
 
     @Override

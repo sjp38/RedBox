@@ -27,11 +27,11 @@ public class BlockSetting implements Serializable {
     }
 
     public BlockSetting(String alias, String number) {
-        this(alias, number, true, true, false, "");
+        this(alias, number, false, false, false, "");
     }
 
     public BlockSetting(String number) {
-        this("", number, true, true, false, "");
+        this("", number, false, false, false, "");
     }
 
     public String toString() {

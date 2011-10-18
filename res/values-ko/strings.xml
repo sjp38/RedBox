@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">연락 종결자</string>
-    <string name="number_input_hint">연락 설정을 할 전화번호를 입력하세요.</string>
-    <string name="from_contact_button">연락처에서..</string>
-    <string name="from_call_log_button">Call log 에서..</string>
+    <string name="number_input_hint">전화번호를 입력하세요.</string>
+
+    <string-array name="menu_list_phonenumber_edit_widget">
+        <item>연락처에서 번호 추가</item>
+        <item>통화기록에서 번호 추가</item>
+    </string-array>
+
     <string name="add_number_button">추가</string>
 
     <string name="error_duplicate_number">같은 번호가 이미 목록에 존재합니다.</string>
@@ -27,8 +31,7 @@
     <string name="setting_delete_call_log_description">이 번호로부터 전화가 오면 곧바로 그 기록을 삭제합니다.</string>
     <string name="setting_send_auto_sms_title">자동 문자 응답 보내기</string>
     <string name="setting_send_auto_sms_description">이 번호로부터 전화가 오면 설정해둔 문자를 보냅니다.</string>
-    <string name="setting_hint_auto_sms_editfield">"자동 응답 메세지를 입력하세요. 예:죄송합니다, 회의 중입니다. 4시 이후 전화
-        드리겠습니다."</string>
+    <string name="setting_hint_auto_sms_editfield">"자동 응답 메세지를 입력하세요. 예:죄송합니다, 회의 중입니다. 4시 이후 전화 드리겠습니다."</string>
     <string name="setting_button_save">저장</string>
     <string name="setting_button_discard">변경사항 취소</string>
     <string name="setting_button_delete">삭제</string>
@@ -38,4 +41,7 @@
 
     <string name="dialog_positive_button">확인</string>
     <string name="dialog_negative_button">취소</string>
+
+    <string name="hint_setting_alias">명칭. 수정하려면 터치하세요.</string>
+    <string name="hint_setting_number">번호. 수정하려면 터치하세요.</string>
 </resources>
