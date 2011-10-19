@@ -2,13 +2,14 @@ package org.clc.android.app.redbox;
 
 import org.clc.android.app.redbox.data.BlockSetting;
 import org.clc.android.app.redbox.data.DataManager;
+import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -17,7 +18,9 @@ import android.widget.Toast;
 
 public class RedBoxBlockSettingActivity extends Activity implements
         View.OnClickListener {
+    private static final String TAG = "RedBox block setting";
     private int mId = 0;
+    private PhoneNumberEditWidget mPhoneNumberEditor = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,6 +33,24 @@ public class RedBoxBlockSettingActivity extends Activity implements
         mId = extras.getInt(RedBoxActivity.ID, 0);
 
         initViews();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case PhoneNumberEditWidget.PICK_CONTACT_REQUEST:
+                if (mPhoneNumberEditor != null) {
+                    mPhoneNumberEditor
+                            .onContactActivityResult(resultCode, data);
+                } else {
+                    Log.e(TAG, "phone number editor is null!!",
+                            new RuntimeException(""));
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     private void initViews() {
@@ -62,18 +83,28 @@ public class RedBoxBlockSettingActivity extends Activity implements
         final EditText input = new EditText(this);
         final TextView target = (TextView) findViewById(id);
         final String writed = target.getText().toString();
-        if (id == R.id.number_textView) {
-            input.setInputType(InputType.TYPE_CLASS_PHONE);
-        }
+        final PhoneNumberEditWidget phoneNumberEditor = new PhoneNumberEditWidget(
+                this, true);
+
         input.setText(writed);
+        phoneNumberEditor.setText(writed);
         builder.setTitle(title);
-        builder.setView(input);
+        if (id == R.id.number_textView) {
+            builder.setView(phoneNumberEditor);
+            mPhoneNumberEditor = phoneNumberEditor;
+        } else {
+            builder.setView(input);
+        }
         builder.setPositiveButton(R.string.dialog_positive_button,
                 new DialogInterface.OnClickListener() {
-
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String text = input.getText().toString();
+                        String text = null;
+                        if (id == R.id.number_textView) {
+                            text = phoneNumberEditor.getText().toString();
+                        } else {
+                            text = input.getText().toString();
+                        }
                         if ("".equals(text) && id == R.id.number_textView) {
                             Toast.makeText(RedBoxBlockSettingActivity.this,
                                     R.string.error_blank_number,

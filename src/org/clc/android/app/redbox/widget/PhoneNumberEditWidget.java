@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
+import android.text.Editable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,8 @@ public class PhoneNumberEditWidget extends LinearLayout {
 
     private static final int FROM_CONTACT_MENU = 0;
     private static final int FROM_CALL_LOG_MENU = 1;
+
+    private boolean mSingleNumber = false;
 
     private EditText mPhonenumberEditText = null;
     private Button mMenuButton = null;
@@ -64,8 +67,23 @@ public class PhoneNumberEditWidget extends LinearLayout {
         }
     };
 
+    public PhoneNumberEditWidget(Context context, boolean singlePhoneNumber) {
+        this(context);
+        initViews(context);
+        mSingleNumber = singlePhoneNumber;
+    }
+
+    public PhoneNumberEditWidget(Context context) {
+        super(context);
+        initViews(context);
+    }
+
     public PhoneNumberEditWidget(Context context, AttributeSet attrs) {
         super(context, attrs);
+        initViews(context);
+    }
+
+    private void initViews(Context context) {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.phonenumber_edit_widget_layout, this, true);
@@ -76,42 +94,68 @@ public class PhoneNumberEditWidget extends LinearLayout {
         mMenuButton.setOnClickListener(mMenuButtonClickListener);
     }
 
+    public void setText(String text) {
+        mPhonenumberEditText.setText(text);
+    }
+
+    public Editable getText() {
+        return mPhonenumberEditText.getText();
+    }
+
+    /**
+     * Set will this widget will be able to get single number or just one
+     * number.
+     * 
+     * @param single
+     */
+    private void setSingleNumberChoice(boolean single) {
+        mSingleNumber = single;
+    }
+
     private void showNumberSelectionDialog(final String name,
-            final CharSequence[] numbers) {
+            final CharSequence[] numbers, boolean singleNumber) {
         final boolean[] checked = new boolean[numbers.length];
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.title_select_number);
-        builder.setMultiChoiceItems(numbers, null,
-                new DialogInterface.OnMultiChoiceClickListener() {
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int which,
-                            boolean isChecked) {
-                        checked[which] = isChecked;
-                    }
-                });
-        builder.setPositiveButton(R.string.add_number_button,
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String addNumber = "";
-                        for (int i = 0; i < numbers.length; i++) {
-                            if (checked[i]) {
-                                if (!"".equals(addNumber)) {
-                                    addNumber += PHONE_NUMBER_SEPERATOR;
-                                } else {
-                                    addNumber += name + ALIAS_SEPERATOR;
-                                }
-                                addNumber += numbers[i];
-                            }
+        if (singleNumber) {
+            builder.setItems(numbers, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+                    mPhonenumberEditText.setText(numbers[item]);
+                }
+            });
+        } else {
+            builder.setMultiChoiceItems(numbers, null,
+                    new DialogInterface.OnMultiChoiceClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which,
+                                boolean isChecked) {
+                            checked[which] = isChecked;
                         }
-                        addNumber += CONTACT_SEPERATOR;
-                        mPhonenumberEditText.setText(addNumber);
-                    }
-                });
-        builder.create().show();
+                    });
+            builder.setPositiveButton(R.string.add_number_button,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String addNumber = "";
+                            for (int i = 0; i < numbers.length; i++) {
+                                if (checked[i]) {
+                                    if (!"".equals(addNumber)) {
+                                        addNumber += PHONE_NUMBER_SEPERATOR;
+                                    } else {
+                                        addNumber += name + ALIAS_SEPERATOR;
+                                    }
+                                    addNumber += numbers[i];
+                                }
+                            }
+                            addNumber += CONTACT_SEPERATOR;
+                            mPhonenumberEditText.setText(addNumber);
+                        }
+                    });
+        }
+        builder.show();
     }
 
     public void onContactActivityResult(int resultCode, Intent data) {
@@ -149,7 +193,7 @@ public class PhoneNumberEditWidget extends LinearLayout {
                                     .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                 }
                 phones.close();
-                showNumberSelectionDialog(name, phoneNumbers);
+                showNumberSelectionDialog(name, phoneNumbers, mSingleNumber);
             }
         }
         cursor.close();
@@ -180,7 +224,7 @@ public class PhoneNumberEditWidget extends LinearLayout {
                     .getColumnIndex(CallLog.Calls.NUMBER));
         }
         cursor.close();
-        this.showNumberSelectionDialog("", numbers);
+        this.showNumberSelectionDialog("", numbers, mSingleNumber);
     }
 
     public ArrayList<BlockSetting> getBlockSettings() {
@@ -204,5 +248,4 @@ public class PhoneNumberEditWidget extends LinearLayout {
         }
         return settings;
     }
-
 }
