@@ -16,6 +16,8 @@
         contribute ;)</string>
     <string name="error_while_pick_contact">Error while pick contact.</string>
     <string name="error_blank_number">Blank number can\'t be added.</string>
+    <string name="error_wrong_number">Wrong number. Number can has digit, -, +, (, ) only.</string>
+
     <string name="title_select_number">Select numbers to add.</string>
     <string name="error_blank_contact">Selected contact has no phone number.</string>
 

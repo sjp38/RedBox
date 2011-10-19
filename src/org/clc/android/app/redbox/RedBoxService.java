@@ -1,8 +1,6 @@
 package org.clc.android.app.redbox;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.clc.android.app.redbox.data.BlockSetting;
 import org.clc.android.app.redbox.data.DataManager;
@@ -25,45 +23,19 @@ import android.widget.Toast;
 
 import com.android.internal.telephony.ITelephony;
 
-public class RedBoxService extends Service implements
-        DataManager.OnBlockSettingChangeListener {
+public class RedBoxService extends Service {
     private static final String TAG = "RedBox_service";
-
-    HashMap<String, BlockSetting> mSettings = null;
-
-    private void setBlockSettingMap() {
-        if (mSettings == null) {
-            mSettings = new HashMap<String, BlockSetting>();
-        }
-        mSettings.clear();
-        final ArrayList<BlockSetting> settings = DataManager.getInstance()
-                .getBlockSettings();
-        for (BlockSetting setting : settings) {
-            String number = setting.mNumber;
-            number = number.replace("-", "");
-            number = number.replace("(", "");
-            number = number.replace(")", "");
-            mSettings.put(number, setting);
-        }
-    }
-
-    @Override
-    public void onBlockSettingsChanged() {
-        setBlockSettingMap();
-    }
 
     private PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
             if (state == TelephonyManager.CALL_STATE_RINGING) {
-                if (mSettings == null) {
-                    setBlockSettingMap();
-                }
-                BlockSetting setting = mSettings.get(incomingNumber);
+                BlockSetting setting = DataManager.getInstance().getBlockSetting(incomingNumber);
                 if (setting == null) {
                     return;
                 }
-                Toast.makeText(getApplicationContext(), "Block!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Block!",
+                        Toast.LENGTH_SHORT).show();
                 if (setting.mRejectCall) {
                     endCall();
                 }
@@ -81,7 +53,6 @@ public class RedBoxService extends Service implements
     public void onCreate() {
         super.onCreate();
 
-        DataManager.getInstance().setOnBlockSettingChangeListener(this);
         startPhoneStateMonitoring();
     }
 

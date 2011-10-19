@@ -32,7 +32,7 @@ public class RedBoxActivity extends Activity implements
     private ListView mNumbersListView = null;
     private NumbersListAdapter mAdapter = null;
     private LayoutInflater mLayoutInflater = null;
-    private PhoneNumberEditWidget mPhoneNumberInsertWidget = null;
+    private PhoneNumberEditWidget mPhoneNumberEditor = null;
 
     private OnClickListener mNumberClickListener = new OnClickListener() {
         @Override
@@ -90,7 +90,7 @@ public class RedBoxActivity extends Activity implements
         mAdapter = new NumbersListAdapter();
         mNumbersListView.setAdapter(mAdapter);
 
-        mPhoneNumberInsertWidget = (PhoneNumberEditWidget) findViewById(R.id.number_input_textView);
+        mPhoneNumberEditor = (PhoneNumberEditWidget) findViewById(R.id.number_input_textView);
 
         Context context = getApplicationContext();
         context.startService(new Intent(context, RedBoxService.class));
@@ -109,8 +109,7 @@ public class RedBoxActivity extends Activity implements
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case PhoneNumberEditWidget.PICK_CONTACT_REQUEST:
-                mPhoneNumberInsertWidget.onContactActivityResult(resultCode,
-                        data);
+                mPhoneNumberEditor.onContactActivityResult(resultCode, data);
                 break;
             default:
                 break;
@@ -138,11 +137,16 @@ public class RedBoxActivity extends Activity implements
     }
 
     public void onAddNumberClicked(View v) {
-        final ArrayList<BlockSetting> settings = mPhoneNumberInsertWidget
+        final ArrayList<BlockSetting> settings = mPhoneNumberEditor
                 .getBlockSettings();
         for (BlockSetting setting : settings) {
+            if (!DataManager.isValid(setting.mNumber)) {
+                Toast.makeText(this, R.string.error_wrong_number,
+                        Toast.LENGTH_SHORT).show();
+            }
             addNumber(setting.mAlias, setting.mNumber, true);
         }
+        mPhoneNumberEditor.setText("");
     }
 
     @Override
@@ -158,9 +162,7 @@ public class RedBoxActivity extends Activity implements
 
         @Override
         public int getCount() {
-            final ArrayList<BlockSetting> settings = DataManager.getInstance()
-                    .getBlockSettings();
-            return settings.size();
+            return DataManager.getInstance().getSize();
         }
 
         @Override
@@ -222,21 +224,6 @@ public class RedBoxActivity extends Activity implements
         @Override
         public void notifyDataSetChanged() {
             super.notifyDataSetChanged();
-        }
-
-        private void deleteNumbers(boolean blocked) {
-            final ArrayList<BlockSetting> deleteSettings = new ArrayList<BlockSetting>();
-            final ArrayList<BlockSetting> settings = DataManager.getInstance()
-                    .getBlockSettings();
-            for (BlockSetting setting : settings) {
-                if (setting.mRejectCall == blocked) {
-                    deleteSettings.add(setting);
-                }
-            }
-            for (BlockSetting deleteSetting : deleteSettings) {
-                DataManager.getInstance().delete(deleteSetting);
-            }
-            notifyDataSetChanged();
         }
     }
 }
