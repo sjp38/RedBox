@@ -7,6 +7,11 @@
     <string-array name="menu_list_phonenumber_edit_widget">
         <item>Get number from contact</item>
         <item>Get number from call log</item>
+        <item>Add Pattern</item>
+    </string-array>
+    <string-array name="menu_list_without_add_pattern_phonenumber_edit_widget">
+        <item>Get number from contact</item>
+        <item>Get number from call log</item>
     </string-array>
 
     <string name="add_number_button">Add</string>
@@ -46,9 +51,21 @@
     <string name="setting_button_discard">Discard</string>
     <string name="setting_button_delete">Delete</string>
 
-    <string name="setting_alias_dialog_title">Insert alias for this number pattern.</string>
+    <string name="setting_alias_dialog_title">Insert alias for this number.</string>
     <string name="setting_number_dialog_title">Insert number pattern which you want to manage.
     </string>
+
+    <string name="pattern_setting_alias_description">Pattern\'s alias. Touch to edit.</string>
+    <string name="pattern_setting_alias_hint">Pattern\'s alias. Touch to edit.</string>
+    <string name="pattern_setting_alias_dialog_title">Insert alias for this pattern.</string>
+    <string name="pattern_setting_startWith">Start with</string>
+    <string name="pattern_setting_startWith_description">All numbers start with this.</string>
+    <string name="pattern_setting_endWith">End with</string>
+    <string name="pattern_setting_endWith_description">All numbers end with tihs.</string>
+    <string name="pattern_setting_all">All numbers</string>
+    <string name="pattern_setting_all_description">All numbers.</string>
+    <string name="pattern_setting_exceptions">Exceptions</string>
+    <string name="pattern_setting_exceptions_description">Exception numbers will ignored although in above condition.</string>
 
     <string name="dialog_positive_button">OK</string>
     <string name="dialog_negative_button">Cancel</string>

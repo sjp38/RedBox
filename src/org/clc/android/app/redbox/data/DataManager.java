@@ -11,6 +11,9 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.clc.android.app.redbox.data.BlockSettingsManager.OnBlockSettingChangeListener;
+import org.clc.android.app.redbox.data.PatternSettingsManager.OnPatternSettingChangeListener;
+
 import android.util.Log;
 
 /**
@@ -31,13 +34,15 @@ public class DataManager {
 
     private static DataManager mSingleton = null;
 
-    private TreeMap<Long, BlockSetting> mBlockSettings = new TreeMap<Long, BlockSetting>();
-    private ArrayList<OnBlockSettingChangeListener> mListeners = new ArrayList<OnBlockSettingChangeListener>();
+    private BlockSettingsManager mBlockManager = null;
+    private PatternSettingsManager mPatternManager = null;
 
     private boolean mDataLoaded = false;
 
-    public DataManager() {
-        getBlockSettings();
+    private DataManager() {
+        mPatternManager = new PatternSettingsManager();
+        mBlockManager = new BlockSettingsManager();
+        loadDatas();
     }
 
     public static DataManager getInstance() {
@@ -47,68 +52,40 @@ public class DataManager {
         return mSingleton;
     }
 
-    private static Long makeKey(final BlockSetting setting) {
-        return makeKey(setting.mNumber);
-    }
-
-    public static boolean isValid(String number) {
-        String parsedNumber = getParsedNumber(number);
-        return parsedNumber.matches("\\d+");
-    }
-
-    private static Long makeKey(final String number) {
-        if (!number.matches("\\d+")) {
-            return null;
-        }
-        return Long.parseLong(number);
-    }
-
-    public static String getParsedNumber(final BlockSetting setting) {
-        return getParsedNumber(setting.mNumber);
-    }
-
-    public static String getParsedNumber(final String number) {
-        String parsed = null;
-
-        for (String seperator : NUMBER_SEPERATORS) {
-            parsed = number.replace(seperator, "");
-        }
-        return parsed;
-    }
-
     /**
      * Get block settings. If this is first time, read from file.
      * 
      * @return
      */
-    public synchronized TreeMap<Long, BlockSetting> getBlockSettings() {
+    public void loadDatas() {
         if (mDataLoaded) {
-            return mBlockSettings;
+            return;
         }
         File file = new File(DATA_FILE_PATH);
         try {
             Log.i(TAG, "load setting data.");
             FileInputStream fis = new FileInputStream(file);
             ObjectInput serialized = new ObjectInputStream(fis);
-            mBlockSettings = (TreeMap<Long, BlockSetting>) serialized
+            TreeMap<Long, BlockSetting> blockSettings = (TreeMap<Long, BlockSetting>) serialized
+                    .readObject();
+            ArrayList<PatternSetting> patternSettings = (ArrayList<PatternSetting>) serialized
                     .readObject();
             serialized.close();
             fis.close();
+            mBlockManager.setDatas(blockSettings);
+            mPatternManager.setDatas(patternSettings);
+
             mDataLoaded = true;
         } catch (IOException e) {
             Log.e(TAG, "IOException while read data file!", e);
-            return mBlockSettings;
+            return;
         } catch (ClassNotFoundException e) {
             Log.e(TAG, "Class not found.", e);
         }
-        return mBlockSettings;
+        return;
     }
 
     public synchronized boolean saveSettings() {
-        if (mBlockSettings == null) {
-            Log.e(TAG, "Requesting settings saving while setting is null!");
-            return true;
-        }
         Log.i(TAG, "save setting data.");
         final File file = new File(DATA_FILE_PATH);
         try {
@@ -117,7 +94,8 @@ public class DataManager {
             }
             final FileOutputStream fos = new FileOutputStream(file);
             ObjectOutput serialized = new ObjectOutputStream(fos);
-            serialized.writeObject(mBlockSettings);
+            serialized.writeObject(mBlockManager.getDatas());
+            serialized.writeObject(mPatternManager.getDatas());
             serialized.flush();
             serialized.close();
             fos.close();
@@ -128,149 +106,138 @@ public class DataManager {
         return true;
     }
 
+    public static boolean isValid(String number) {
+        String parsedNumber = getParsedNumber(number);
+        return parsedNumber.matches("\\d+");
+    }
+
+    public static String getParsedNumber(final BlockSetting setting) {
+        return getParsedNumber(setting.mNumber);
+    }
+
+    public static String getParsedNumber(final String number) {
+        String parsed = number;
+
+        for (String seperator : NUMBER_SEPERATORS) {
+            parsed = parsed.replace(seperator, "");
+        }
+        return parsed;
+    }
+
     public int getSize() {
-        return mBlockSettings.size();
+        return mPatternManager.getSize() + mBlockManager.getSize();
     }
 
-    private Long getKeyForId(int id) {
-        final Long[] keys = mBlockSettings.keySet().toArray(new Long[0]);
-        return keys[id];
+    public ArrayList<PatternSetting> getPatterns() {
+        return mPatternManager.getDatas();
     }
 
-    public BlockSetting getBlockSetting(int id) {
-        if (id >= mBlockSettings.size()) {
-            return null;
+    /**
+     * For block / pattern.
+     * 
+     * @param id
+     * @return
+     */
+    public BlockSetting get(int id) {
+        if (id < mPatternManager.getSize()) {
+            return mPatternManager.get(id);
         }
-        final Long key = getKeyForId(id);
-        return mBlockSettings.get(key);
+        return mBlockManager.get(id - mPatternManager.getSize());
     }
 
-    public BlockSetting getBlockSetting(String number) {
-        final Long key = makeKey(number);
-        return mBlockSettings.get(key);
+    /**
+     * For block only.
+     * 
+     * @param parsedNumber
+     * @return
+     */
+    public BlockSetting getBlockSetting(String parsedNumber) {
+        return mBlockManager.get(parsedNumber);
     }
 
+    /**
+     * For block only.
+     * 
+     * @param setting
+     * @return
+     */
     public boolean isExist(BlockSetting setting) {
-        final Long key = makeKey(setting);
-        return isExistBlockSetting(key);
+        return mBlockManager.isExist(setting);
     }
 
-    private boolean isExistBlockSetting(Long key) {
-        return mBlockSettings.get(key) != null;
-    }
-
-    public boolean add(BlockSetting setting) {
+    public void add(BlockSetting setting) {
         Log.d(TAG, "add " + setting.toString());
-        Long key = makeKey(setting);
-        if (isExistBlockSetting(key)) {
-            return false;
-        }
-        mBlockSettings.put(key, setting);
-        notifyDataChanged();
-        return true;
-    }
-
-    private void delete(final Long key) {
-        mBlockSettings.remove(key);
-        notifyDataChanged();
-    }
-
-    public void delete(final int id) {
-        final Long key = getKeyForId(id);
-        delete(key);
-    }
-
-    public void delete(final String number) {
-        final Long key = makeKey(number);
-        delete(key);
-    }
-
-    public void delete(final BlockSetting setting) {
-        final Long key = makeKey(setting);
-        delete(key);
-    }
-
-    public boolean isExist(final String number) {
-        final Long key = makeKey(number);
-        return mBlockSettings.get(key) != null;
-    }
-
-    private void notifyDataChanged() {
-        for (OnBlockSettingChangeListener listener : mListeners) {
-            listener.onBlockSettingsChanged();
+        if (setting instanceof PatternSetting) {
+            mPatternManager.add((PatternSetting) setting);
+        } else {
+            mBlockManager.add(setting);
         }
     }
 
-    BlockSetting getValueForId(final int id) {
-        final Long key = getKeyForId(id);
-        return mBlockSettings.get(key);
-    }
-
-    public void setSetting(final int id, final BlockSetting setting) {
-        BlockSetting originalSetting = getValueForId(id);
-        final Long oldKey = makeKey(originalSetting.mNumber);
-        mBlockSettings.remove(oldKey);
-
-        originalSetting.mAlias = setting.mAlias;
-        originalSetting.mNumber = setting.mNumber;
-        originalSetting.mRejectCall = setting.mRejectCall;
-        originalSetting.mDeleteCallLog = setting.mDeleteCallLog;
-        originalSetting.mSendAutoSMS = setting.mSendAutoSMS;
-        originalSetting.mAutoSMS = setting.mAutoSMS;
-
-        Long key = makeKey(setting.mNumber);
-        mBlockSettings.put(key, setting);
-        notifyDataChanged();
-    }
-
-    public void setAlias(final int id, final String alias) {
-        final BlockSetting setting = getValueForId(id);
-        setting.mAlias = alias;
-        notifyDataChanged();
-    }
-
-    public void setNumber(final int id, final String number) {
-        final BlockSetting setting = getValueForId(id);
-        final Long oldKey = makeKey(setting.mNumber);
-        mBlockSettings.remove(oldKey);
-
-        setting.mNumber = number;
-
-        final Long key = makeKey(number);
-        mBlockSettings.put(key, setting);
-        notifyDataChanged();
-    }
-
-    public void setRejectCall(final int id, final boolean block) {
-        final BlockSetting setting = getValueForId(id);
-        setting.mRejectCall = block;
-        notifyDataChanged();
-    }
-
-    public void setDeleteCallLog(final int id, final boolean delete) {
-        final BlockSetting setting = getValueForId(id);
-        setting.mDeleteCallLog = delete;
-        notifyDataChanged();
-    }
-
-    public void setSendAutoSMS(final int id, final boolean send,
-            final String message) {
-        final BlockSetting setting = getValueForId(id);
-        setting.mSendAutoSMS = send;
-        if (message != null) {
-            setting.mAutoSMS = message;
+    public void remove(final int id) {
+        if (id < mPatternManager.getSize()) {
+            mPatternManager.remove(id);
+            return;
         }
+        mBlockManager.remove(id - mPatternManager.getSize());
+    }
+
+    public void remove(final BlockSetting setting) {
+        if (setting instanceof PatternSetting) {
+            mPatternManager.remove((PatternSetting) setting);
+        } else {
+            mBlockManager.remove(setting);
+        }
+    }
+
+    public boolean isExist(final String parsedNumber) {
+        return mBlockManager.isExist(parsedNumber);
+    }
+
+    public void update(final int id, final BlockSetting setting) {
+        if (id < mPatternManager.getSize()) {
+            if (setting instanceof PatternSetting) {
+                mPatternManager.update(id, (PatternSetting) setting);
+            } else {
+                Log.e(TAG, "Block setting update with pattern setting id!");
+            }
+            return;
+        }
+        mBlockManager.update(id - mPatternManager.getSize(), setting);
+    }
+
+    public void updateRejectCall(final int id, boolean reject) {
+        if (id < mPatternManager.getSize()) {
+            mPatternManager.updateRejectCall(id, reject);
+            return;
+        }
+        mBlockManager.updateRejectCall(id - mPatternManager.getSize(), reject);
+    }
+
+    public void updateDeleteCallLog(final int id, boolean deleteCallLog) {
+        if (id < mPatternManager.getSize()) {
+            mPatternManager.updateDeleteCallLog(id, deleteCallLog);
+            return;
+        }
+        mBlockManager.updateDeleteCallLog(id - mPatternManager.getSize(),
+                deleteCallLog);
+    }
+
+    public void updateSendAutoSMS(final int id, boolean send) {
+        if (id < mPatternManager.getSize()) {
+            mPatternManager.updateSendAutoSMS(id, send);
+            return;
+        }
+        mBlockManager.updateSendAutoSMS(id - mPatternManager.getSize(), send);
     }
 
     public void setOnBlockSettingChangeListener(
             OnBlockSettingChangeListener listener) {
-        if (mListeners == null) {
-            mListeners = new ArrayList<OnBlockSettingChangeListener>();
-        }
-        mListeners.add(listener);
+        mBlockManager.setOnBlockSettingChangeListener(listener);
     }
 
-    public static interface OnBlockSettingChangeListener {
-        void onBlockSettingsChanged();
+    public void setOnPatternSettingChangeListener(
+            OnPatternSettingChangeListener listener) {
+        mPatternManager.setOnPatternSettingChangeListener(listener);
     }
 }

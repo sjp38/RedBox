@@ -11,16 +11,21 @@ import java.io.Serializable;
 public class BlockSetting implements Serializable {
     public String mAlias;
     public String mNumber;
+    public String mParsedNumber;
     public boolean mRejectCall;
     public boolean mDeleteCallLog;
     public boolean mSendAutoSMS;
     public String mAutoSMS;
 
-    public BlockSetting(String alias, String number, boolean blockCall,
+    public BlockSetting() {
+    }
+
+    public BlockSetting(String alias, String number, boolean rejectCall,
             boolean deleteCallLog, boolean sendAutoSMS, String autoSMS) {
         mAlias = alias;
         mNumber = number;
-        mRejectCall = blockCall;
+        mParsedNumber = DataManager.getParsedNumber(number);
+        mRejectCall = rejectCall;
         mDeleteCallLog = deleteCallLog;
         mSendAutoSMS = sendAutoSMS;
         mAutoSMS = autoSMS;

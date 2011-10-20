@@ -1,9 +1,11 @@
 package org.clc.android.app.redbox;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 import org.clc.android.app.redbox.data.BlockSetting;
 import org.clc.android.app.redbox.data.DataManager;
+import org.clc.android.app.redbox.data.PatternSetting;
 
 import android.app.Service;
 import android.content.Context;
@@ -30,21 +32,19 @@ public class RedBoxService extends Service {
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
             if (state == TelephonyManager.CALL_STATE_RINGING) {
-                BlockSetting setting = DataManager.getInstance().getBlockSetting(incomingNumber);
+                final ArrayList<PatternSetting> settings = DataManager
+                        .getInstance().getPatterns();
+                for (PatternSetting setting : settings) {
+                    if (setting.matches(incomingNumber)) {
+                        execute(setting, incomingNumber);
+                    }
+                }
+                BlockSetting setting = DataManager.getInstance()
+                        .getBlockSetting(incomingNumber);
                 if (setting == null) {
                     return;
                 }
-                Toast.makeText(getApplicationContext(), "Block!",
-                        Toast.LENGTH_SHORT).show();
-                if (setting.mRejectCall) {
-                    endCall();
-                }
-                if (setting.mDeleteCallLog) {
-                    deleteCallLog(incomingNumber);
-                }
-                if (setting.mSendAutoSMS) {
-                    sendSMS(incomingNumber, setting.mAutoSMS);
-                }
+                execute(setting, incomingNumber);
             }
         }
     };
@@ -59,6 +59,20 @@ public class RedBoxService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    private void execute(BlockSetting setting, String incomingNumber) {
+        Toast.makeText(getApplicationContext(), "Works!", Toast.LENGTH_SHORT)
+                .show();
+        if (setting.mRejectCall) {
+            endCall();
+        }
+        if (setting.mDeleteCallLog) {
+            deleteCallLog(incomingNumber);
+        }
+        if (setting.mSendAutoSMS) {
+            sendSMS(incomingNumber, setting.mAutoSMS);
+        }
     }
 
     private void startPhoneStateMonitoring() {

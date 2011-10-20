@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@android:style/ButtonBar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:baselineAligned="false" >
+
+    <Button
+        android:id="@+id/save"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:onClick="onSaveButtonClicked"
+        android:text="@string/setting_button_save" >
+    </Button>
+
+    <Button
+        android:id="@+id/discard"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:onClick="onDiscardButtonClicked"
+        android:text="@string/setting_button_discard" >
+    </Button>
+
+    <Button
+        android:id="@+id/delete"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:onClick="onDeleteButtonClicked"
+        android:text="@string/setting_button_delete" >
+    </Button>
+
+</LinearLayout>

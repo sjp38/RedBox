@@ -56,7 +56,7 @@ public class RedBoxBlockSettingActivity extends Activity implements
     private void initViews() {
         final int id = mId;
 
-        BlockSetting setting = DataManager.getInstance().getBlockSetting(id);
+        BlockSetting setting = DataManager.getInstance().get(id);
 
         final TextView alias = (TextView) findViewById(R.id.alias_textView);
         final TextView number = (TextView) findViewById(R.id.number_textView);
@@ -160,7 +160,7 @@ public class RedBoxBlockSettingActivity extends Activity implements
         BlockSetting setting = new BlockSetting(aliasValue, numberValue,
                 rejectCallValue, deleteCallLogValue, sendAutoSMSValue,
                 autoSMSValue);
-        DataManager.getInstance().setSetting(mId, setting);
+        DataManager.getInstance().update(mId, setting);
 
         finish();
     }
@@ -170,7 +170,7 @@ public class RedBoxBlockSettingActivity extends Activity implements
     }
 
     public void onDeleteButtonClicked(View v) {
-        DataManager.getInstance().delete(mId);
+        DataManager.getInstance().remove(mId);
         finish();
     }
 }

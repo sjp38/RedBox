@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import org.clc.android.app.redbox.data.BlockSetting;
 import org.clc.android.app.redbox.data.DataManager;
-import org.clc.android.app.redbox.data.DataManager.OnBlockSettingChangeListener;
+import org.clc.android.app.redbox.data.PatternSetting;
+import org.clc.android.app.redbox.data.BlockSettingsManager.OnBlockSettingChangeListener;
+import org.clc.android.app.redbox.data.PatternSettingsManager.OnPatternSettingChangeListener;
 import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
 
 import android.app.Activity;
@@ -24,7 +26,7 @@ import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class RedBoxActivity extends Activity implements
-        OnBlockSettingChangeListener {
+        OnBlockSettingChangeListener, OnPatternSettingChangeListener {
     private static final String TAG = "RedBox";
 
     public static final String ID = "id";
@@ -38,14 +40,21 @@ public class RedBoxActivity extends Activity implements
         @Override
         public void onClick(View v) {
             final View parent = (View) v.getParent();
-            final int id = parent.getId();
+            final int id = (Integer) parent.getTag();
 
-            Intent blockSettingIntent = new Intent();
-            blockSettingIntent.setClass(RedBoxActivity.this,
-                    RedBoxBlockSettingActivity.class);
-            blockSettingIntent.putExtra(ID, id);
+            Intent settingIntent = new Intent();
 
-            RedBoxActivity.this.startActivity(blockSettingIntent);
+            BlockSetting setting = DataManager.getInstance().get(id);
+            if (setting instanceof PatternSetting) {
+                settingIntent.setClass(RedBoxActivity.this,
+                        RedBoxPatternSettingActivity.class);
+            } else {
+                settingIntent.setClass(RedBoxActivity.this,
+                        RedBoxBlockSettingActivity.class);
+            }
+            settingIntent.putExtra(ID, id);
+
+            RedBoxActivity.this.startActivity(settingIntent);
 
         }
     };
@@ -54,8 +63,8 @@ public class RedBoxActivity extends Activity implements
         @Override
         public void onCheckedChanged(CompoundButton view, boolean isChecked) {
             final View parent = (View) view.getParent();
-            final int id = parent.getId();
-            DataManager.getInstance().setRejectCall(id, isChecked);
+            final int id = (Integer) parent.getTag();
+            DataManager.getInstance().updateRejectCall(id, isChecked);
         }
     };
 
@@ -63,8 +72,8 @@ public class RedBoxActivity extends Activity implements
         @Override
         public void onCheckedChanged(CompoundButton view, boolean isChecked) {
             final View parent = (View) view.getParent();
-            final int id = parent.getId();
-            DataManager.getInstance().setDeleteCallLog(id, isChecked);
+            final int id = (Integer) parent.getTag();
+            DataManager.getInstance().updateDeleteCallLog(id, isChecked);
         }
     };
 
@@ -72,10 +81,9 @@ public class RedBoxActivity extends Activity implements
         @Override
         public void onCheckedChanged(CompoundButton view, boolean isChecked) {
             final View parent = (View) view.getParent();
-            final int id = parent.getId();
-            BlockSetting setting = DataManager.getInstance()
-                    .getBlockSetting(id);
-            DataManager.getInstance().setSendAutoSMS(id, isChecked, null);
+            final int id = (Integer) parent.getTag();
+            BlockSetting setting = DataManager.getInstance().get(id);
+            DataManager.getInstance().updateSendAutoSMS(id, isChecked);
         }
     };
 
@@ -83,7 +91,7 @@ public class RedBoxActivity extends Activity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.phone_number_insert_list);
 
         mNumbersListView = (ListView) findViewById(R.id.numbersList);
 
@@ -96,6 +104,7 @@ public class RedBoxActivity extends Activity implements
         context.startService(new Intent(context, RedBoxService.class));
 
         DataManager.getInstance().setOnBlockSettingChangeListener(this);
+        DataManager.getInstance().setOnPatternSettingChangeListener(this);
     }
 
     @Override
@@ -124,7 +133,8 @@ public class RedBoxActivity extends Activity implements
             }
             return;
         }
-        if (DataManager.getInstance().isExist(number)) {
+        final String parsedNumber = DataManager.getParsedNumber(number);
+        if (DataManager.getInstance().isExist(parsedNumber)) {
             if (notify) {
                 Toast.makeText(this, R.string.error_duplicate_number,
                         Toast.LENGTH_SHORT).show();
@@ -154,6 +164,11 @@ public class RedBoxActivity extends Activity implements
         mAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onPatternSettingsChanged() {
+        mAdapter.notifyDataSetChanged();
+    }
+
     private class NumbersListAdapter extends BaseAdapter {
         NumbersListAdapter() {
             super();
@@ -171,10 +186,12 @@ public class RedBoxActivity extends Activity implements
             if (convertView == null) {
                 numberList = mLayoutInflater.inflate(R.layout.number_list,
                         parent, false);
+                View trashButton = numberList.findViewById(R.id.delete_button);
+                trashButton.setVisibility(View.GONE);
             } else {
                 numberList = convertView;
             }
-            numberList.setId(position);
+            numberList.setTag((Integer) position);
             TextView alias = (TextView) numberList
                     .findViewById(R.id.alias_textview);
             TextView number = (TextView) numberList
@@ -190,9 +207,11 @@ public class RedBoxActivity extends Activity implements
                     .findViewById(R.id.aliasNumberLayout);
             aliasNumberLayout.setOnClickListener(mNumberClickListener);
 
-            BlockSetting setting = DataManager.getInstance().getBlockSetting(
-                    position);
-            if (setting.mAlias.equals("")) {
+            BlockSetting setting = DataManager.getInstance().get(position);
+            if (setting instanceof PatternSetting) {
+                alias.setText(setting.mAlias);
+                number.setText("");
+            } else if (setting.mAlias.equals("")) {
                 alias.setText(setting.mNumber);
                 number.setText("");
             } else {
@@ -200,20 +219,23 @@ public class RedBoxActivity extends Activity implements
                 number.setText(setting.mNumber);
             }
             rejectCallCheckBox.setChecked(setting.mRejectCall);
-            rejectCallCheckBox
-                    .setOnCheckedChangeListener(mRejectCallCheckChangeListener);
             removeCallLogCheckBox.setChecked(setting.mDeleteCallLog);
-            removeCallLogCheckBox
-                    .setOnCheckedChangeListener(mRemoveCallLogCheckChangeListener);
             sendAutoSMSCheckBox.setChecked(setting.mSendAutoSMS);
-            sendAutoSMSCheckBox
-                    .setOnCheckedChangeListener(mSendAutoSMSCheckChangeListener);
+
+            if (convertView == null) {
+                rejectCallCheckBox
+                        .setOnCheckedChangeListener(mRejectCallCheckChangeListener);
+                removeCallLogCheckBox
+                        .setOnCheckedChangeListener(mRemoveCallLogCheckChangeListener);
+                sendAutoSMSCheckBox
+                        .setOnCheckedChangeListener(mSendAutoSMSCheckChangeListener);
+            }
             return numberList;
         }
 
         @Override
         public Object getItem(int position) {
-            return DataManager.getInstance().getBlockSetting(position);
+            return DataManager.getInstance().get(position);
         }
 
         @Override
