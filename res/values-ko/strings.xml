@@ -46,8 +46,8 @@
     <string name="setting_alias_dialog_title">이 번호의 명칭을 입력하세요.</string>
     <string name="setting_number_dialog_title">관리하실 번호 패턴을 입력하세요.</string>
 
-    <string name="pattern_setting_name_description">패턴의 이름. 수정하려면 터치하세요.</string>
-    <string name="pattern_setting_name_hint">패턴 이름. 수정하려면 터치하세요.</string>
+    <string name="pattern_setting_alias_description">패턴의 이름. 수정하려면 터치하세요.</string>
+    <string name="pattern_setting_alias_hint">패턴 이름. 수정하려면 터치하세요.</string>
     <string name="pattern_setting_startWith">시작 번호</string>
     <string name="pattern_setting_startWith_description">이 번호로 시작하는 모든 번호.</string>
     <string name="pattern_setting_endWith">종료 번호</string>
