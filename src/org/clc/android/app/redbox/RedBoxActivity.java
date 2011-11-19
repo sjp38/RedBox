@@ -20,14 +20,20 @@ import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
+
 public class RedBoxActivity extends Activity implements
         OnBlockSettingChangeListener, OnPatternSettingChangeListener {
     private static final String TAG = "RedBox";
+    private static final String AD_ID = "";
 
     public static final String ID = "id";
 
@@ -35,6 +41,9 @@ public class RedBoxActivity extends Activity implements
     private NumbersListAdapter mAdapter = null;
     private LayoutInflater mLayoutInflater = null;
     private PhoneNumberEditWidget mPhoneNumberEditor = null;
+
+    // for advertise.
+    private AdView mAdView;
 
     private OnClickListener mNumberClickListener = new OnClickListener() {
         @Override
@@ -105,6 +114,16 @@ public class RedBoxActivity extends Activity implements
 
         DataManager.getInstance().setOnBlockSettingChangeListener(this);
         DataManager.getInstance().setOnPatternSettingChangeListener(this);
+
+        mAdView = new AdView(this, AdSize.BANNER, AD_ID);
+        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.advertiseLayout);
+        mainLayout.addView(mAdView);
+        mAdView.loadAd(new AdRequest());
+    }
+
+    public void onDestroy() {
+        mAdView.destroy();
+        super.onDestroy();
     }
 
     @Override

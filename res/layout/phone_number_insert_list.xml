@@ -1,21 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-    <LinearLayout android:id="@+id/linearLayout2"
-        android:layout_width="match_parent" android:layout_height="wrap_content" android:baselineAligned="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="true" >
+
         <org.clc.android.app.redbox.widget.PhoneNumberEditWidget
-            android:layout_height="wrap_content" android:id="@+id/number_input_textView"
-            android:layout_weight="1" android:layout_width="wrap_content">
+            android:id="@+id/number_input_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
         </org.clc.android.app.redbox.widget.PhoneNumberEditWidget>
-        <Button android:text="@string/add_number_button"
+
+        <Button
             android:id="@+id/add_number_button"
-            android:layout_width="wrap_content" android:onClick="onAddNumberClicked"
-            android:layout_gravity="center" android:layout_height="match_parent"></Button>
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:onClick="onAddNumberClicked"
+            android:text="@string/add_number_button" >
+        </Button>
     </LinearLayout>
-    <ListView android:id="@+id/numbersList"
-        android:scrollbarStyle="outsideOverlay" android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/advertiseLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:baselineAligned="true" >
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/numbersList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/advertiseLayout"
+            android:scrollbarStyle="outsideOverlay" />
+    </RelativeLayout>
 
 </LinearLayout>
