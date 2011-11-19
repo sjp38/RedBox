@@ -113,14 +113,21 @@ public class RedBoxHistoryActivity extends Activity implements
 
             if (!rule.mRejectCall) {
                 rejectedCall.setVisibility(View.GONE);
+            } else {
+                rejectedCall.setVisibility(View.VISIBLE);
             }
+
             if (!rule.mDeleteCallLog) {
                 deletedCallLog.setVisibility(View.GONE);
+            } else {
+                deletedCallLog.setVisibility(View.VISIBLE);
             }
             if (!rule.mSendAutoSMS) {
                 sentAutoSMS.setVisibility(View.GONE);
                 autoSMS.setVisibility(View.GONE);
             } else {
+                sentAutoSMS.setVisibility(View.VISIBLE);
+                autoSMS.setVisibility(View.VISIBLE);
                 autoSMS.setText(rule.mAutoSMS);
             }
 
