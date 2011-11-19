@@ -48,7 +48,9 @@ public class RedBoxHistoryActivity extends Activity implements
         mAdView = new AdView(this, AdSize.BANNER, RedBoxActivity.AD_ID);
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.advertiseLayout);
         mainLayout.addView(mAdView);
-        mAdView.loadAd(new AdRequest());
+        AdRequest adRequest = new AdRequest();
+        adRequest.addTestDevice(AdRequest.TEST_EMULATOR);
+        mAdView.loadAd(adRequest);
     }
 
     @Override
