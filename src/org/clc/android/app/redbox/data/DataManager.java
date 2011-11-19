@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.clc.android.app.redbox.data.ActionHistoryManager.OnHistoryChangeListener;
 import org.clc.android.app.redbox.data.BlockSettingsManager.OnBlockSettingChangeListener;
 import org.clc.android.app.redbox.data.PatternSettingsManager.OnPatternSettingChangeListener;
 
@@ -36,12 +37,14 @@ public class DataManager {
 
     private BlockSettingsManager mBlockManager = null;
     private PatternSettingsManager mPatternManager = null;
+    private ActionHistoryManager mHistoryManager = null;
 
     private boolean mDataLoaded = false;
 
     private DataManager() {
         mPatternManager = new PatternSettingsManager();
         mBlockManager = new BlockSettingsManager();
+        mHistoryManager = new ActionHistoryManager();
         loadDatas();
     }
 
@@ -70,10 +73,13 @@ public class DataManager {
                     .readObject();
             ArrayList<PatternSetting> patternSettings = (ArrayList<PatternSetting>) serialized
                     .readObject();
+            ArrayList<ActionRecord> actionRecords = (ArrayList<ActionRecord>) serialized
+                    .readObject();
             serialized.close();
             fis.close();
             mBlockManager.setDatas(blockSettings);
             mPatternManager.setDatas(patternSettings);
+            mHistoryManager.setDatas(actionRecords);
 
             mDataLoaded = true;
         } catch (IOException e) {
@@ -96,6 +102,7 @@ public class DataManager {
             ObjectOutput serialized = new ObjectOutputStream(fos);
             serialized.writeObject(mBlockManager.getDatas());
             serialized.writeObject(mPatternManager.getDatas());
+            serialized.writeObject(mHistoryManager.getDatas());
             serialized.flush();
             serialized.close();
             fos.close();
@@ -128,6 +135,10 @@ public class DataManager {
         return mPatternManager.getSize() + mBlockManager.getSize();
     }
 
+    public int getHistorySize() {
+        return mHistoryManager.getSize();
+    }
+
     public ArrayList<PatternSetting> getPatterns() {
         return mPatternManager.getDatas();
     }
@@ -143,6 +154,10 @@ public class DataManager {
             return mPatternManager.get(id);
         }
         return mBlockManager.get(id - mPatternManager.getSize());
+    }
+
+    public ActionRecord getHistory(int id) {
+        return mHistoryManager.get(id);
     }
 
     /**
@@ -172,6 +187,11 @@ public class DataManager {
         } else {
             mBlockManager.add(setting);
         }
+    }
+
+    public void addHistory(ActionRecord record) {
+        Log.d(TAG, "add history " + record.toString());
+        mHistoryManager.add(record);
     }
 
     public void remove(final int id) {
@@ -239,5 +259,9 @@ public class DataManager {
     public void setOnPatternSettingChangeListener(
             OnPatternSettingChangeListener listener) {
         mPatternManager.setOnPatternSettingChangeListener(listener);
+    }
+
+    public void setOnHistoryChangeListener(OnHistoryChangeListener listener) {
+        mHistoryManager.setOnHistoryChangeListener(listener);
     }
 }

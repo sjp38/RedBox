@@ -3,6 +3,7 @@ package org.clc.android.app.redbox;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import org.clc.android.app.redbox.data.ActionRecord;
 import org.clc.android.app.redbox.data.BlockSetting;
 import org.clc.android.app.redbox.data.DataManager;
 import org.clc.android.app.redbox.data.PatternSetting;
@@ -21,7 +22,6 @@ import android.telephony.PhoneStateListener;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.internal.telephony.ITelephony;
 
@@ -62,16 +62,34 @@ public class RedBoxService extends Service {
     }
 
     private void execute(BlockSetting setting, String incomingNumber) {
-        Toast.makeText(getApplicationContext(), "Works!", Toast.LENGTH_SHORT)
-                .show();
+        boolean worked = false;
         if (setting.mRejectCall) {
             endCall();
+            worked = true;
         }
         if (setting.mDeleteCallLog) {
             deleteCallLog(incomingNumber);
+            worked = true;
         }
         if (setting.mSendAutoSMS) {
             sendSMS(incomingNumber, setting.mAutoSMS);
+            worked = true;
+        }
+
+        if (!worked) {
+            return;
+        }
+        try {
+            BlockSetting copiedSetting = (BlockSetting) setting.clone();
+            ActionRecord record = new ActionRecord(System.currentTimeMillis(),
+                    copiedSetting);
+            DataManager.getInstance().addHistory(record);
+            final Intent historyIntent = new Intent(this,
+                    RedBoxHistoryActivity.class);
+            historyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(historyIntent);
+        } catch (CloneNotSupportedException e) {
+            Log.e(TAG, "Failed to copy block setting for history." + e);
         }
     }
 
@@ -161,6 +179,9 @@ public class RedBoxService extends Service {
     }
 
     private void sendSMS(String number, String msg) {
+        if ("".equals(number) || "".equals(msg)) {
+            return;
+        }
         SmsManager smsManager = SmsManager.getDefault();
         smsManager.sendTextMessage(number, null, msg, null, null);
     }

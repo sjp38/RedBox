@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Contact terminator</string>
     <string name="number_input_hint">Insert number.
     </string>
@@ -72,4 +72,10 @@
 
     <string name="hint_setting_alias">Alias. Touch to edit.</string>
     <string name="hint_setting_number">Number. Touch to edit.</string>
+
+    <string name="record_from">"From <xliff:g id="name" example="Alice">%1$s</xliff:g>(<xliff:g id="number" example="1112223333">%2$s</xliff:g>)"</string>
+    <string name="record_matched_rule">"Matched by <xliff:g id="matched_by" example="all_pattern">%s</xliff:g>"</string>
+    <string name="record_rejected_call">Rejected call.</string>
+    <string name="record_deleted_call_log">Deleted call log.</string>
+    <string name="record_sent_auto_sms">Sent below auto SMS.</string>
 </resources>

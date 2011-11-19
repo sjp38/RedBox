@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @author sj38.park
  * 
  */
-public class BlockSetting implements Serializable {
+public class BlockSetting implements Serializable, Cloneable {
     public String mAlias;
     public String mNumber;
     public String mParsedNumber;
@@ -37,6 +37,10 @@ public class BlockSetting implements Serializable {
 
     public BlockSetting(String number) {
         this("", number, false, false, false, "");
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     public String toString() {

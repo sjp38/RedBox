@@ -33,7 +33,7 @@ import com.google.ads.AdView;
 public class RedBoxActivity extends Activity implements
         OnBlockSettingChangeListener, OnPatternSettingChangeListener {
     private static final String TAG = "RedBox";
-    private static final String AD_ID = "";
+    public static final String AD_ID = "";
 
     public static final String ID = "id";
 
