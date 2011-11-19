@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.RemoteException;
 import android.provider.CallLog;
 import android.telephony.PhoneStateListener;
 import android.telephony.SmsManager;
@@ -27,6 +28,8 @@ import com.android.internal.telephony.ITelephony;
 
 public class RedBoxService extends Service {
     private static final String TAG = "RedBox_service";
+
+    private ITelephony mTelephony = null;
 
     private PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
         @Override
@@ -54,6 +57,19 @@ public class RedBoxService extends Service {
         super.onCreate();
 
         startPhoneStateMonitoring();
+
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+        try {
+            Class c = Class.forName(telephonyManager.getClass().getName());
+            Method m = c.getDeclaredMethod("getITelephony");
+            m.setAccessible(true);
+
+            mTelephony = (ITelephony) m.invoke(telephonyManager);
+        } catch (Throwable e) {
+            Log.e(TAG, "Fail to end call!!!", e);
+
+        }
     }
 
     @Override
@@ -106,18 +122,10 @@ public class RedBoxService extends Service {
     }
 
     private void endCall() {
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-
         try {
-            Class c = Class.forName(telephonyManager.getClass().getName());
-            Method m = c.getDeclaredMethod("getITelephony");
-            m.setAccessible(true);
-
-            ITelephony phoneInterface = (ITelephony) m.invoke(telephonyManager);
-            phoneInterface.endCall();
-        } catch (Throwable e) {
-            Log.e(TAG, "Fail to end call!!!", e);
-
+            mTelephony.endCall();
+        } catch (RemoteException e) {
+            Log.e(TAG, "Remote exception while end call!", e);
         }
     }
 
