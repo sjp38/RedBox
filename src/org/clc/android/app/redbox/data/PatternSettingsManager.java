@@ -1,3 +1,4 @@
+
 package org.clc.android.app.redbox.data;
 
 import java.util.ArrayList;
@@ -6,7 +7,6 @@ import java.util.ArrayList;
  * Manage data control.
  * 
  * @author sj38.park
- * 
  */
 public class PatternSettingsManager {
     private static final String TAG = "RedBox data_pattern";
@@ -14,9 +14,9 @@ public class PatternSettingsManager {
     private ArrayList<PatternSetting> mPatternSettings = new ArrayList<PatternSetting>();
     private ArrayList<OnPatternSettingChangeListener> mPatternListeners = new ArrayList<OnPatternSettingChangeListener>();
 
-    public PatternSettingsManager() {        
+    public PatternSettingsManager() {
     }
-    
+
     public void setDatas(ArrayList<PatternSetting> settings) {
         mPatternSettings = settings;
     }
@@ -87,6 +87,20 @@ public class PatternSettingsManager {
     public void remove(PatternSetting setting) {
         mPatternSettings.remove(setting);
         notifyPatternsChanged();
+    }
+    
+    public int getId(PatternSetting pattern) {
+        if (pattern.mAlias == null || "".equals(pattern.mAlias)) {
+            return -1;
+        }
+        
+        for (int i = 0; i < mPatternSettings.size(); i++) {
+            final PatternSetting nowPattern = mPatternSettings.get(i);
+            if (pattern.mAlias.equals(nowPattern.mAlias)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public static interface OnPatternSettingChangeListener {

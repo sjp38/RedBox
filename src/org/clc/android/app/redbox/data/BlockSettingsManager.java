@@ -1,3 +1,4 @@
+
 package org.clc.android.app.redbox.data;
 
 import java.util.ArrayList;
@@ -9,7 +10,6 @@ import android.util.Log;
  * Manage data control.
  * 
  * @author sj38.park
- * 
  */
 public class BlockSettingsManager {
     private static final String TAG = "RedBox data_blockManaging";
@@ -19,7 +19,7 @@ public class BlockSettingsManager {
 
     public BlockSettingsManager() {
     }
-    
+
     public void setDatas(TreeMap<Long, BlockSetting> blockSettings) {
         mBlockSettings = blockSettings;
     }
@@ -143,6 +143,18 @@ public class BlockSettingsManager {
             mListeners = new ArrayList<OnBlockSettingChangeListener>();
         }
         mListeners.add(listener);
+    }
+    
+    public int getId(BlockSetting rule) {
+        final Long searchingKey = makeKey(rule.mParsedNumber);
+        final Long[] keys = mBlockSettings.keySet().toArray(new Long[0]);
+        
+        for (int i=0 ; i <keys.length; i++) {
+            if (keys[i].equals(searchingKey)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public static interface OnBlockSettingChangeListener {

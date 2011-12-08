@@ -1,6 +1,8 @@
+
 package org.clc.android.app.redbox;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.actionbarcompat.ActionBarActivity;
 import com.google.ads.AdRequest;
@@ -19,6 +22,7 @@ import org.clc.android.app.redbox.data.ActionHistoryManager.OnHistoryChangeListe
 import org.clc.android.app.redbox.data.ActionRecord;
 import org.clc.android.app.redbox.data.BlockSetting;
 import org.clc.android.app.redbox.data.DataManager;
+import org.clc.android.app.redbox.data.PatternSetting;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -32,6 +36,38 @@ public class RedBoxHistoryActivity extends ActionBarActivity implements
     private RecordsListAdapter mAdapter;
 
     private LayoutInflater mLayoutInflater;
+
+    private View.OnClickListener mReactionClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            final View parent = (View) v.getParent();
+            int position = (Integer) parent.getTag();
+            final ActionRecord record = DataManager.getInstance().getHistory(
+                    position);
+
+            final BlockSetting matchedRule = record.mMatchedRule;
+            final int id = DataManager.getInstance().getId(matchedRule);
+            if (id == -1) {
+                Toast.makeText(RedBoxHistoryActivity.this, R.string.no_more_exist_rule,
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent settingIntent = new Intent();
+
+            BlockSetting setting = DataManager.getInstance().get(id);
+            if (setting instanceof PatternSetting) {
+                settingIntent.setClass(RedBoxHistoryActivity.this,
+                        RedBoxPatternSettingActivity.class);
+            } else {
+                settingIntent.setClass(RedBoxHistoryActivity.this,
+                        RedBoxBlockSettingActivity.class);
+            }
+            settingIntent.putExtra(RedBoxActivity.ID, id);
+
+            RedBoxHistoryActivity.this.startActivity(settingIntent);
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -134,6 +170,9 @@ public class RedBoxHistoryActivity extends ActionBarActivity implements
             }
 
             recordList.setTag((Integer) position);
+
+            View reaction = recordList.findViewById(R.id.reaction_for_record);
+            reaction.setOnClickListener(mReactionClickListener);
 
             return recordList;
         }

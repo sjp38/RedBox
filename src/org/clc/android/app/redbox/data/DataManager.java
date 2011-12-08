@@ -212,7 +212,7 @@ public class DataManager {
 
     public boolean isExist(final String parsedNumber) {
         return mBlockManager.isExist(parsedNumber);
-    }
+    }    
 
     public void update(final int id, final BlockSetting setting) {
         if (id < mPatternManager.getSize()) {
@@ -263,5 +263,14 @@ public class DataManager {
 
     public void setOnHistoryChangeListener(OnHistoryChangeListener listener) {
         mHistoryManager.setOnHistoryChangeListener(listener);
+    }
+    
+    public int getId(final BlockSetting rule) {
+        if (rule instanceof PatternSetting) {
+            int id = mPatternManager.getId((PatternSetting)rule);
+            return id == -1 ? -1 : id;
+        }
+        int id = mBlockManager.getId(rule);
+        return id == -1 ? -1 : id + mPatternManager.getSize();
     }
 }

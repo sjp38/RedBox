@@ -84,4 +84,6 @@
     <string name="record_rejected_call">Rejected call.</string>
     <string name="record_deleted_call_log">Deleted call log.</string>
     <string name="record_sent_auto_sms">Sent below auto SMS.</string>
+
+    <string name="no_more_exist_rule">This rule doesn\'t exist now. Maybe changed or removed.</string>
 </resources>
