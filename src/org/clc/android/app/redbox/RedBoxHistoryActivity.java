@@ -1,14 +1,5 @@
 package org.clc.android.app.redbox;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-
-import org.clc.android.app.redbox.data.ActionRecord;
-import org.clc.android.app.redbox.data.BlockSetting;
-import org.clc.android.app.redbox.data.DataManager;
-import org.clc.android.app.redbox.data.ActionHistoryManager.OnHistoryChangeListener;
-
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,11 +10,20 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.android.actionbarcompat.ActionBarActivity;
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
 
-public class RedBoxHistoryActivity extends Activity implements
+import org.clc.android.app.redbox.data.ActionHistoryManager.OnHistoryChangeListener;
+import org.clc.android.app.redbox.data.ActionRecord;
+import org.clc.android.app.redbox.data.BlockSetting;
+import org.clc.android.app.redbox.data.DataManager;
+
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+
+public class RedBoxHistoryActivity extends ActionBarActivity implements
         OnHistoryChangeListener {
     private static final String TAG = "RedBox_history";
 

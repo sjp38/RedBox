@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Contact terminator</string>
+    <string name="block_rule_setting_activity">Reaction setting</string>
+    <string name="pattern_setting_activity_label">Pattern setting</string>
+    <string name="history_activity_label">Recent history</string>
+
     <string name="number_input_hint">Insert number.
     </string>
+
+    <string name="menu_action_log">Action log</string>
 
     <string-array name="menu_list_phonenumber_edit_widget">
         <item>Get number from contact</item>

@@ -1,10 +1,5 @@
 package org.clc.android.app.redbox;
 
-import org.clc.android.app.redbox.data.BlockSetting;
-import org.clc.android.app.redbox.data.DataManager;
-import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,7 +11,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class RedBoxBlockSettingActivity extends Activity implements
+import com.example.android.actionbarcompat.ActionBarActivity;
+
+import org.clc.android.app.redbox.data.BlockSetting;
+import org.clc.android.app.redbox.data.DataManager;
+import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
+
+public class RedBoxBlockSettingActivity extends ActionBarActivity implements
         View.OnClickListener {
     private static final String TAG = "RedBox block setting";
     private int mId = 0;

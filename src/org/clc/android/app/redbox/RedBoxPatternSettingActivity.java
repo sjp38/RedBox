@@ -1,14 +1,5 @@
 package org.clc.android.app.redbox;
 
-import java.util.ArrayList;
-
-import org.clc.android.app.redbox.data.BlockSetting;
-import org.clc.android.app.redbox.data.DataManager;
-import org.clc.android.app.redbox.data.PatternSetting;
-import org.clc.android.app.redbox.data.PatternSetting.ExceptionNumber;
-import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -23,7 +14,17 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class RedBoxPatternSettingActivity extends Activity {
+import com.example.android.actionbarcompat.ActionBarActivity;
+
+import org.clc.android.app.redbox.data.BlockSetting;
+import org.clc.android.app.redbox.data.DataManager;
+import org.clc.android.app.redbox.data.PatternSetting;
+import org.clc.android.app.redbox.data.PatternSetting.ExceptionNumber;
+import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
+
+import java.util.ArrayList;
+
+public class RedBoxPatternSettingActivity extends ActionBarActivity {
 
     private TextView mAliasTextView = null;
     private EditText mStartWithEditText = null;

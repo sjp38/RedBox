@@ -1,36 +1,40 @@
+
 package org.clc.android.app.redbox;
 
-import java.util.ArrayList;
-
-import org.clc.android.app.redbox.data.BlockSetting;
-import org.clc.android.app.redbox.data.DataManager;
-import org.clc.android.app.redbox.data.PatternSetting;
-import org.clc.android.app.redbox.data.BlockSettingsManager.OnBlockSettingChangeListener;
-import org.clc.android.app.redbox.data.PatternSettingsManager.OnPatternSettingChangeListener;
-import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
-
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 
+import com.example.android.actionbarcompat.ActionBarActivity;
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
 
-public class RedBoxActivity extends Activity implements
+import org.clc.android.app.redbox.data.BlockSetting;
+import org.clc.android.app.redbox.data.BlockSettingsManager.OnBlockSettingChangeListener;
+import org.clc.android.app.redbox.data.DataManager;
+import org.clc.android.app.redbox.data.PatternSetting;
+import org.clc.android.app.redbox.data.PatternSettingsManager.OnPatternSettingChangeListener;
+import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
+
+import java.util.ArrayList;
+
+public class RedBoxActivity extends ActionBarActivity implements
         OnBlockSettingChangeListener, OnPatternSettingChangeListener {
     private static final String TAG = "RedBox";
     public static final String AD_ID = "";
@@ -144,6 +148,23 @@ public class RedBoxActivity extends Activity implements
             default:
                 break;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.redbox_activity_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_action_log:
+                startActivity(new Intent(this, RedBoxHistoryActivity.class));
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void addNumber(String alias, String number, boolean notify) {

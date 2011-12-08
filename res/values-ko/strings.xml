@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">연락 종결자</string>
+    <string name="block_rule_setting_activity">동작 설정</string>
+    <string name="pattern_setting_activity_label">패턴 설정</string>
+    <string name="history_activity_label">최근 기록</string>
+
     <string name="number_input_hint">전화번호를 입력하세요.</string>
+
+    <string name="menu_action_log">동작 기록</string>
 
     <string-array name="menu_list_phonenumber_edit_widget">
         <item>연락처에서 번호 추가</item>
