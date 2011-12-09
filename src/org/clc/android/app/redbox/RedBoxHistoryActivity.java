@@ -139,7 +139,7 @@ public class RedBoxHistoryActivity extends ActionBarActivity implements
             from.setText(getString(R.string.record_from, rule.mNumber));
 
             SimpleDateFormat format = new SimpleDateFormat(
-                    "yyyy.mm.dd hh:mm:ss");
+                    "yyyy.MM.dd hh:mm:ss");
             Timestamp timeStamp = new Timestamp(record.mTimeStamp);
             when.setText(format.format(timeStamp));
 
