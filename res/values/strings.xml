@@ -75,6 +75,10 @@
     <string name="pattern_setting_exceptions">Exceptions</string>
     <string name="pattern_setting_exceptions_description">Exception numbers will ignored although in above condition.</string>
 
+    <string name="save_changes_before_closing">Save changes before closing?</string>
+    <string name="save_and_quit">Save and quit</string>
+    <string name="quit_without_saving">Quit without saving</string>
+
     <string name="dialog_positive_button">OK</string>
     <string name="dialog_negative_button">Cancel</string>
 

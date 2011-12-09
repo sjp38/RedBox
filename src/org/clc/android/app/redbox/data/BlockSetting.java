@@ -1,3 +1,4 @@
+
 package org.clc.android.app.redbox.data;
 
 import java.io.Serializable;
@@ -6,7 +7,6 @@ import java.io.Serializable;
  * Just struct.
  * 
  * @author sj38.park
- * 
  */
 public class BlockSetting implements Serializable, Cloneable {
     public String mAlias;

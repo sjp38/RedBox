@@ -1,3 +1,4 @@
+
 package org.clc.android.app.redbox;
 
 import android.app.AlertDialog;
@@ -5,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -82,6 +84,40 @@ public class RedBoxPatternSettingActivity extends ActionBarActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        PatternSetting loadedSetting = null;
+        if (mId == -1) {
+            loadedSetting = new PatternSetting("", "", "", false, null,
+                    false, false, false, "");
+        } else {
+            loadedSetting = (PatternSetting) DataManager.getInstance().get(mId);
+        }
+        final PatternSetting currentSetting = getCurrentSetting();
+
+        if (loadedSetting.toString().equals(currentSetting.toString())) {
+            super.onBackPressed();
+            return;
+        }
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.save_changes_before_closing);
+        builder.setPositiveButton(R.string.save_and_quit,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        onSaveButtonClicked(null);
+                    }
+                });
+        builder.setNegativeButton(R.string.quit_without_saving,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        onDiscardButtonClicked(null);
+                    }
+                });
+        builder.show();
+    }
+
     private void initViews() {
         mAliasTextView = (TextView) findViewById(R.id.pattern_setting_alias);
         mStartWithEditText = (EditText) findViewById(R.id.pattern_setting_startWith_input);
@@ -114,12 +150,12 @@ public class RedBoxPatternSettingActivity extends ActionBarActivity {
             deleteCallLogCheckBox.setChecked(setting.mDeleteCallLog);
             sendAutoSMSCheckBox.setChecked(setting.mSendAutoSMS);
             autoSMSEditText.setText(setting.mAutoSMS);
-            
+
             final ArrayList<ExceptionNumber> exceptions = setting.mExceptions;
             for (ExceptionNumber exception : exceptions) {
                 addExceptionList(exception);
             }
-            mExceptions = exceptions;
+            mExceptions = (ArrayList<ExceptionNumber>) exceptions.clone();
         }
     }
 
@@ -195,7 +231,7 @@ public class RedBoxPatternSettingActivity extends ActionBarActivity {
         }
     };
 
-    public void onSaveButtonClicked(View v) {
+    private PatternSetting getCurrentSetting() {
         final String alias = mAliasTextView.getText().toString();
         final String startWith = mStartWithEditText.getText().toString();
         final String endWith = mEndWithEditText.getText().toString();
@@ -212,9 +248,13 @@ public class RedBoxPatternSettingActivity extends ActionBarActivity {
         final boolean sendAutoSMS = sendAutoSMSCheckBox.isChecked();
         final String autoSMS = autoSMSEditText.getText().toString();
 
-        final PatternSetting setting = new PatternSetting(alias, startWith,
+        return new PatternSetting(alias, startWith,
                 endWith, allNumber, exceptions, rejectCall, deleteCallLog,
                 sendAutoSMS, autoSMS);
+    }
+
+    public void onSaveButtonClicked(View v) {
+        final PatternSetting setting = getCurrentSetting();
         if (mId == -1) {
             DataManager.getInstance().add(setting);
         } else {

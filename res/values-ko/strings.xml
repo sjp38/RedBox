@@ -65,6 +65,10 @@
     <string name="pattern_setting_exceptions">예외 번호</string>
     <string name="pattern_setting_exceptions_description">위의 규칙에 해당하더라도 이 번호들은 무시됩니다.</string>
 
+    <string name="save_changes_before_closing">변경 사항을 저장하고 종료하시겠습니까?</string>
+    <string name="save_and_quit">저장하고 종료</string>
+    <string name="quit_without_saving">저장하지 않고 종료</string>
+
     <string name="dialog_positive_button">확인</string>
     <string name="dialog_negative_button">취소</string>
 

@@ -1,3 +1,4 @@
+
 package org.clc.android.app.redbox;
 
 import android.app.AlertDialog;
@@ -139,10 +140,9 @@ public class RedBoxBlockSettingActivity extends ActionBarActivity implements
                         R.id.number_textView);
                 break;
         }
-
     }
 
-    public void onSaveButtonClicked(View v) {
+    private BlockSetting getCurrentSetting() {
         final TextView alias = (TextView) findViewById(R.id.alias_textView);
         final TextView number = (TextView) findViewById(R.id.number_textView);
 
@@ -151,26 +151,57 @@ public class RedBoxBlockSettingActivity extends ActionBarActivity implements
         final CheckBox sendAutoSMSCheckBox = (CheckBox) findViewById(R.id.sendAutoSMSCheckBox);
         final EditText autoSMS = (EditText) findViewById(R.id.autoSMSeditText);
 
-        String aliasValue = alias.getText().toString();
-        String numberValue = number.getText().toString();
-        boolean rejectCallValue = rejectCallCheckBox.isChecked();
-        boolean deleteCallLogValue = deleteCallLogCheckBox.isChecked();
-        boolean sendAutoSMSValue = sendAutoSMSCheckBox.isChecked();
-        String autoSMSValue = autoSMS.getText().toString();
+        final String aliasValue = alias.getText().toString();
+        final String numberValue = number.getText().toString();
+        final boolean rejectCallValue = rejectCallCheckBox.isChecked();
+        final boolean deleteCallLogValue = deleteCallLogCheckBox.isChecked();
+        final boolean sendAutoSMSValue = sendAutoSMSCheckBox.isChecked();
+        final String autoSMSValue = autoSMS.getText().toString();
 
-        BlockSetting setting = new BlockSetting(aliasValue, numberValue,
+        return new BlockSetting(aliasValue, numberValue,
                 rejectCallValue, deleteCallLogValue, sendAutoSMSValue,
                 autoSMSValue);
-        DataManager.getInstance().update(mId, setting);
+    }
+
+    @Override
+    public void onBackPressed() {
+        final BlockSetting loadedSetting = DataManager.getInstance().get(mId);
+        final BlockSetting currentSetting = getCurrentSetting();
+
+        if (loadedSetting.toString().equals(currentSetting.toString())) {
+            super.onBackPressed();
+            return;
+        }
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.save_changes_before_closing);
+        builder.setPositiveButton(R.string.save_and_quit,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        onSaveButtonClicked(null);
+                    }
+                });
+        builder.setNegativeButton(R.string.quit_without_saving,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        onDiscardButtonClicked(null);
+                    }
+                });
+        builder.show();
+    }
+
+    public void onSaveButtonClicked(final View v) {
+        DataManager.getInstance().update(mId, getCurrentSetting());
 
         finish();
     }
 
-    public void onDiscardButtonClicked(View v) {
+    public void onDiscardButtonClicked(final View v) {
         finish();
     }
 
-    public void onDeleteButtonClicked(View v) {
+    public void onDeleteButtonClicked(final View v) {
         DataManager.getInstance().remove(mId);
         finish();
     }

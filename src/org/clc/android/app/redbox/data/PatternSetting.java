@@ -1,3 +1,4 @@
+
 package org.clc.android.app.redbox.data;
 
 import java.io.Serializable;
@@ -65,4 +66,22 @@ public class PatternSetting extends BlockSetting implements Serializable {
         }
     }
 
+    public String toString() {
+        String exceptions = "";
+        if (mExceptions == null) {
+            exceptions = "";
+        } else {
+            for (ExceptionNumber exception : mExceptions) {
+                exceptions += exception.mNumber + ", ";
+            }
+        }
+
+        return "{ Alias : " + mAlias + " / " + "Number : " + mNumber + " / "
+                + "Start pattern : " + mStartPattern + " / " + "End pattern : " + mEndPattern
+                + " / " + "All number? : " + mAllNumber + " / "
+                + "exceptions : " + exceptions + " / "
+                + "RejectCall : " + mRejectCall + " / " + "DeleteCallLog : "
+                + mDeleteCallLog + " / " + "SendAutoSMS : " + mSendAutoSMS
+                + " / " + "AutoSMS : " + mAutoSMS + "}";
+    }
 }
