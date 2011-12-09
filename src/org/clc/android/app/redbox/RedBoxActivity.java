@@ -21,10 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.actionbarcompat.ActionBarActivity;
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
 
+import org.clc.android.app.redbox.ad.AdvertisementManager;
 import org.clc.android.app.redbox.data.BlockSetting;
 import org.clc.android.app.redbox.data.BlockSettingsManager.OnBlockSettingChangeListener;
 import org.clc.android.app.redbox.data.DataManager;
@@ -37,7 +35,6 @@ import java.util.ArrayList;
 public class RedBoxActivity extends ActionBarActivity implements
         OnBlockSettingChangeListener, OnPatternSettingChangeListener {
     private static final String TAG = "RedBox";
-    public static final String AD_ID = "";
 
     public static final String ID = "id";
 
@@ -47,7 +44,7 @@ public class RedBoxActivity extends ActionBarActivity implements
     private PhoneNumberEditWidget mPhoneNumberEditor = null;
 
     // for advertise.
-    private AdView mAdView;
+    private View mAdView;
 
     private OnClickListener mNumberClickListener = new OnClickListener() {
         @Override
@@ -119,16 +116,13 @@ public class RedBoxActivity extends ActionBarActivity implements
         DataManager.getInstance().setOnBlockSettingChangeListener(this);
         DataManager.getInstance().setOnPatternSettingChangeListener(this);
 
-        mAdView = new AdView(this, AdSize.BANNER, AD_ID);
-        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.advertiseLayout);
-        mainLayout.addView(mAdView);
-        AdRequest adRequest = new AdRequest();
-        adRequest.addTestDevice(AdRequest.TEST_EMULATOR);
-        mAdView.loadAd(adRequest);
+        mAdView = AdvertisementManager.getAdvertisementView(this);
+        LinearLayout adLayout = (LinearLayout) findViewById(R.id.advertiseLayout);
+        adLayout.addView(mAdView);
     }
 
     public void onDestroy() {
-        mAdView.destroy();
+        AdvertisementManager.destroyAd(mAdView);
         super.onDestroy();
     }
 

@@ -2,6 +2,7 @@
 package org.clc.android.app.redbox;
 
 import android.content.Context;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,10 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.actionbarcompat.ActionBarActivity;
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
 
+import org.clc.android.app.redbox.ad.AdvertisementManager;
 import org.clc.android.app.redbox.data.ActionHistoryManager.OnHistoryChangeListener;
 import org.clc.android.app.redbox.data.ActionRecord;
 import org.clc.android.app.redbox.data.BlockSetting;
@@ -32,7 +31,7 @@ public class RedBoxHistoryActivity extends ActionBarActivity implements
     private static final String TAG = "RedBox_history";
 
     private ListView mRecordsListView;
-    private AdView mAdView;
+    private View mAdView;
     private RecordsListAdapter mAdapter;
 
     private LayoutInflater mLayoutInflater;
@@ -81,12 +80,15 @@ public class RedBoxHistoryActivity extends ActionBarActivity implements
 
         DataManager.getInstance().setOnHistoryChangeListener(this);
 
-        mAdView = new AdView(this, AdSize.BANNER, RedBoxActivity.AD_ID);
-        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.advertiseLayout);
-        mainLayout.addView(mAdView);
-        AdRequest adRequest = new AdRequest();
-        adRequest.addTestDevice(AdRequest.TEST_EMULATOR);
-        mAdView.loadAd(adRequest);
+        mAdView = AdvertisementManager.getAdvertisementView(this);
+        LinearLayout adLayout = (LinearLayout) findViewById(R.id.advertiseLayout);
+        adLayout.addView(mAdView);
+    }
+
+    @Override
+    public void onDestroy() {
+        AdvertisementManager.destroyAd(mAdView);
+        super.onDestroy();
     }
 
     @Override
