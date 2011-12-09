@@ -47,7 +47,7 @@ public class RedBoxHistoryActivity extends ActionBarActivity implements
             final BlockSetting matchedRule = record.mMatchedRule;
             final int id = DataManager.getInstance().getId(matchedRule);
             if (id == -1) {
-                Toast.makeText(RedBoxHistoryActivity.this, R.string.no_more_exist_rule,
+                Toast.makeText(RedBoxHistoryActivity.this, R.string.can_not_find_this_rule,
                         Toast.LENGTH_SHORT).show();
                 return;
             }
