@@ -3,6 +3,7 @@ package org.clc.android.app.redbox;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +29,7 @@ import org.clc.android.app.redbox.data.BlockSettingsManager.OnBlockSettingChange
 import org.clc.android.app.redbox.data.DataManager;
 import org.clc.android.app.redbox.data.PatternSetting;
 import org.clc.android.app.redbox.data.PatternSettingsManager.OnPatternSettingChangeListener;
+import org.clc.android.app.redbox.util.string.RedBoxStringUtil;
 import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
 
 import java.util.ArrayList;
@@ -245,7 +247,12 @@ public class RedBoxActivity extends ActionBarActivity implements
 
             BlockSetting setting = DataManager.getInstance().get(position);
             if (setting instanceof PatternSetting) {
-                alias.setText(setting.mAlias);
+                String aliasString = setting.mAlias;
+                if (RedBoxStringUtil.isNullOrEmpty(aliasString)) {
+                    aliasString = getResources().getString(R.string.pattern_unnamed)
+                            + " " + position;
+                }
+                alias.setText(aliasString);
                 number.setText("");
             } else if (setting.mAlias.equals("")) {
                 alias.setText(setting.mNumber);

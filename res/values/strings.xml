@@ -61,6 +61,8 @@
     <string name="setting_number_dialog_title">Insert number pattern which you want to manage.
     </string>
 
+    <string name="pattern_unnamed">unnamed pattern</string>
+
     <string name="pattern_setting_alias_description">Pattern\'s alias. Touch to edit.</string>
     <string name="pattern_setting_alias_hint">Pattern\'s alias. Touch to edit.</string>
     <string name="pattern_setting_alias_dialog_title">Insert alias for this pattern.</string>
