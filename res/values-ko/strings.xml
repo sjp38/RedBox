@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">연락 종결자</string>
+    <string name="app_name">지금은 바빠요.</string>
     <string name="block_rule_setting_activity">동작 설정</string>
     <string name="pattern_setting_activity_label">패턴 설정</string>
     <string name="history_activity_label">최근 기록</string>

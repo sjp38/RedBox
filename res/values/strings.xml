@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Contact terminator</string>
+    <string name="app_name">I\'m busy, now.</string>
     <string name="block_rule_setting_activity">Reaction setting</string>
     <string name="pattern_setting_activity_label">Pattern setting</string>
     <string name="history_activity_label">Recent history</string>

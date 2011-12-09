@@ -37,7 +37,7 @@ import java.util.ArrayList;
 public class RedBoxActivity extends ActionBarActivity implements
         OnBlockSettingChangeListener, OnPatternSettingChangeListener {
     private static final String TAG = "RedBox";
-    public static final String AD_ID = "a14ec64ead68024";
+    public static final String AD_ID = "";
 
     public static final String ID = "id";
 

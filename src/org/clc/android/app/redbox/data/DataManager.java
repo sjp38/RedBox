@@ -1,3 +1,4 @@
+
 package org.clc.android.app.redbox.data;
 
 import java.io.File;
@@ -21,17 +22,20 @@ import android.util.Log;
  * Manage data control.
  * 
  * @author sj38.park
- * 
  */
 public class DataManager {
     private static final String TAG = "RedBox data";
 
+    // Data version, not application version.
+    private static final int VERSION = 1;
     private static final String DATA_FILE_PATH = "/data/data/org.clc.android.app.redbox/block_settings.rbx";
 
     /**
      * Phone number seperators that can be element of number.
      */
-    public static final String[] NUMBER_SEPERATORS = { "+", "-", " ", "(", ")" };
+    public static final String[] NUMBER_SEPERATORS = {
+            "+", "-", " ", "(", ")"
+    };
 
     private static DataManager mSingleton = null;
 
@@ -212,7 +216,7 @@ public class DataManager {
 
     public boolean isExist(final String parsedNumber) {
         return mBlockManager.isExist(parsedNumber);
-    }    
+    }
 
     public void update(final int id, final BlockSetting setting) {
         if (id < mPatternManager.getSize()) {
@@ -264,10 +268,10 @@ public class DataManager {
     public void setOnHistoryChangeListener(OnHistoryChangeListener listener) {
         mHistoryManager.setOnHistoryChangeListener(listener);
     }
-    
+
     public int getId(final BlockSetting rule) {
         if (rule instanceof PatternSetting) {
-            int id = mPatternManager.getId((PatternSetting)rule);
+            int id = mPatternManager.getId((PatternSetting) rule);
             return id == -1 ? -1 : id;
         }
         int id = mBlockManager.getId(rule);

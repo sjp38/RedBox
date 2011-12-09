@@ -114,7 +114,7 @@ public class BlockSettingsManager {
         final Long oldKey = makeKey(originalSetting.mParsedNumber);
         mBlockSettings.remove(oldKey);
 
-        Long key = makeKey(setting.mNumber);
+        Long key = makeKey(setting.mParsedNumber);
         mBlockSettings.put(key, setting);
         notifyDataChanged();
     }
