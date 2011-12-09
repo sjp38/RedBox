@@ -97,6 +97,9 @@ public class RedBoxService extends Service {
         }
         try {
             BlockSetting copiedSetting = (BlockSetting) setting.clone();
+            if (setting instanceof PatternSetting) {
+                copiedSetting.mNumber = incomingNumber;
+            }
             ActionRecord record = new ActionRecord(System.currentTimeMillis(),
                     copiedSetting);
             DataManager.getInstance().addHistory(record);

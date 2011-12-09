@@ -136,8 +136,7 @@ public class RedBoxHistoryActivity extends ActionBarActivity implements
             final TextView autoSMS = (TextView) recordList
                     .findViewById(R.id.record_auto_sms_textView);
 
-            from.setText(getString(R.string.record_from, rule.mAlias,
-                    rule.mNumber));
+            from.setText(getString(R.string.record_from, rule.mNumber));
 
             SimpleDateFormat format = new SimpleDateFormat(
                     "yyyy.mm.dd hh:mm:ss");

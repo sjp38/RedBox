@@ -79,7 +79,7 @@
     <string name="hint_setting_alias">Alias. Touch to edit.</string>
     <string name="hint_setting_number">Number. Touch to edit.</string>
 
-    <string name="record_from">"From <xliff:g id="name" example="Alice">%1$s</xliff:g>(<xliff:g id="number" example="1112223333">%2$s</xliff:g>)"</string>
+    <string name="record_from">"From <xliff:g id="name" example="Alice">%1$s</xliff:g>"</string>
     <string name="record_matched_rule">"Matched by <xliff:g id="matched_by" example="all_pattern">%s</xliff:g>"</string>
     <string name="record_rejected_call">Rejected call.</string>
     <string name="record_deleted_call_log">Deleted call log.</string>

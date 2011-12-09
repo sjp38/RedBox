@@ -69,7 +69,7 @@
     <string name="hint_setting_alias">명칭. 수정하려면 터치하세요.</string>
     <string name="hint_setting_number">번호. 수정하려면 터치하세요.</string>
 
-    <string name="record_from">"<xliff:g id="name" example="Alice">%1$s</xliff:g>(<xliff:g id="number" example="1112223333">%2$s</xliff:g>)로부터 온 전화"</string>
+    <string name="record_from">"<xliff:g id="name" example="Alice">%1$s</xliff:g>로부터 온 전화"</string>
     <string name="record_matched_rule">"<xliff:g id="matched_by" example="all_pattern">%s</xliff:g> 규칙에 의해..."</string>
     <string name="record_rejected_call">전화를 끊었습니다.</string>
     <string name="record_deleted_call_log">전화 기록을 지웠습니다..</string>
