@@ -41,7 +41,8 @@
         </activity>
         <activity
             android:label="@string/history_activity_label"
-            android:name=".RedBoxHistoryActivity" >
+            android:name=".RedBoxHistoryActivity"
+            android:launchMode="singleTop" >
         </activity>
 
         <service android:name=".RedBoxService" />
