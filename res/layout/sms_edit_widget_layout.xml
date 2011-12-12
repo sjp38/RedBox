@@ -18,12 +18,28 @@
         </requestFocus>
     </EditText>
 
-    <Button
-        android:id="@+id/sms_edit_menu_button"
+    <LinearLayout
+        android:id="@+id/linearLayout1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@drawable/phonenumber_edit_widget_menu"
-        android:text="" />
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/sms_edit_menu_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/phonenumber_edit_widget_menu"
+            android:text="" />
+
+        <TextView
+            android:id="@+id/sms_textLength"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="right"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    </LinearLayout>
 
 </LinearLayout>

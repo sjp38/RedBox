@@ -5,12 +5,15 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.clc.android.app.redbox.R;
 import org.clc.android.app.redbox.data.BlockSetting;
@@ -18,9 +21,12 @@ import org.clc.android.app.redbox.data.DataManager;
 
 import java.util.ArrayList;
 
-public class SmsEditWidget extends LinearLayout {
+public class SmsEditWidget extends LinearLayout implements TextWatcher {
+    private static final int MAX_MESSAGE_LENGTH = 280;
+
     private EditText mSmsEditText;
     private Button mMenuButton;
+    private TextView mCurrentLengthTextView;
 
     private View.OnClickListener mMenuButtonClickListener = new View.OnClickListener() {
 
@@ -52,7 +58,7 @@ public class SmsEditWidget extends LinearLayout {
                         insertText += "\n";
                     }
                     mSmsEditText.setText(insertText + totalArray[which]);
-                    mSmsEditText.setSelection(insertText.length() + totalArray[which].length());
+                    mSmsEditText.setSelection(mSmsEditText.getText().length());
                 }
             });
             builder.show();
@@ -76,7 +82,12 @@ public class SmsEditWidget extends LinearLayout {
 
         mSmsEditText = (EditText) findViewById(R.id.sms_editText);
         mMenuButton = (Button) findViewById(R.id.sms_edit_menu_button);
+        mCurrentLengthTextView = (TextView) findViewById(R.id.sms_textLength);
 
+        mSmsEditText.addTextChangedListener(this);
+        InputFilter[] filterArray = new InputFilter[1];
+        filterArray[0] = new InputFilter.LengthFilter(MAX_MESSAGE_LENGTH);
+        mSmsEditText.setFilters(filterArray);
         mMenuButton.setOnClickListener(mMenuButtonClickListener);
     }
 
@@ -86,5 +97,19 @@ public class SmsEditWidget extends LinearLayout {
 
     public Editable getText() {
         return mSmsEditText.getText();
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        final int currentLength = mSmsEditText.getText().toString().length();
+        mCurrentLengthTextView.setText(currentLength + "/" + MAX_MESSAGE_LENGTH);
     }
 }

@@ -203,6 +203,9 @@ public class RedBoxService extends Service {
             return;
         }
         SmsManager smsManager = SmsManager.getDefault();
-        smsManager.sendTextMessage(number, null, msg, null, null);
+        ArrayList<String> msgs = smsManager.divideMessage(msg);
+        for (String dividedMsg : msgs) {
+            smsManager.sendTextMessage(number, null, dividedMsg, null, null);
+        }
     }
 }
