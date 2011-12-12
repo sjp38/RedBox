@@ -35,6 +35,7 @@ public class RedBoxService extends Service {
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
             if (state == TelephonyManager.CALL_STATE_RINGING) {
+                incomingNumber = DataManager.getParsedNumber(incomingNumber);
                 final ArrayList<PatternSetting> settings = DataManager
                         .getInstance().getPatterns();
                 for (PatternSetting setting : settings) {
