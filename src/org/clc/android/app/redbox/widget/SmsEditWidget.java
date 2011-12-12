@@ -43,7 +43,7 @@ public class SmsEditWidget extends LinearLayout implements TextWatcher {
             final CharSequence[] items;
             items = getContext().getResources().getTextArray(
                     R.array.auto_sms_preset);
-            for (int i = 0; i < items.length; i++) {
+            for (int i = items.length-1; i >= 0; i--) {
                 totalItems.add(0, items[i]);
             }
             final CharSequence[] totalArray = totalItems

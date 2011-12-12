@@ -2,7 +2,7 @@
 <resources>
 
     <string-array name="auto_sms_preset">
-        <item>"죄송합니다, 지금은 바쁩니다."</item>
+        <item>"죄송합니다, 지금은 전화 받기 곤란합니다."</item>
         <item>"회의 중입니다."</item>
         <item>"자는 중입니다."</item>
         <item>"지금은 전화를 받을 수가 없습니다."</item>
