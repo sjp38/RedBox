@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +22,7 @@ import org.clc.android.app.redbox.data.DataManager;
 import org.clc.android.app.redbox.data.PatternSetting;
 import org.clc.android.app.redbox.data.PatternSetting.ExceptionNumber;
 import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
+import org.clc.android.app.redbox.widget.SmsEditWidget;
 
 import java.util.ArrayList;
 
@@ -144,7 +144,7 @@ public class RedBoxPatternSettingActivity extends ActionBarActivity {
             final CheckBox rejectCallCheckBox = (CheckBox) findViewById(R.id.rejectCallcheckBox);
             final CheckBox deleteCallLogCheckBox = (CheckBox) findViewById(R.id.deleteCallLogCheckBox);
             final CheckBox sendAutoSMSCheckBox = (CheckBox) findViewById(R.id.sendAutoSMSCheckBox);
-            final EditText autoSMSEditText = (EditText) findViewById(R.id.autoSMSeditText);
+            final SmsEditWidget autoSMSEditText = (SmsEditWidget) findViewById(R.id.autoSMSeditText);
 
             rejectCallCheckBox.setChecked(setting.mRejectCall);
             deleteCallLogCheckBox.setChecked(setting.mDeleteCallLog);
@@ -241,7 +241,7 @@ public class RedBoxPatternSettingActivity extends ActionBarActivity {
         final CheckBox rejectCallCheckBox = (CheckBox) findViewById(R.id.rejectCallcheckBox);
         final CheckBox deleteCallLogCheckBox = (CheckBox) findViewById(R.id.deleteCallLogCheckBox);
         final CheckBox sendAutoSMSCheckBox = (CheckBox) findViewById(R.id.sendAutoSMSCheckBox);
-        final EditText autoSMSEditText = (EditText) findViewById(R.id.autoSMSeditText);
+        final SmsEditWidget autoSMSEditText = (SmsEditWidget) findViewById(R.id.autoSMSeditText);
 
         final boolean rejectCall = rejectCallCheckBox.isChecked();
         final boolean deleteCallLog = deleteCallLogCheckBox.isChecked();

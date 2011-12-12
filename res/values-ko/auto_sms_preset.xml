@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="auto_sms_preset">
+        <item>"죄송합니다, 지금은 바쁩니다."</item>
+        <item>"회의 중입니다."</item>
+        <item>"자는 중입니다."</item>
+        <item>"지금은 전화를 받을 수가 없습니다."</item>
+        <item>"문자 등으로 용무를 남겨 주시면 나중에 연락 드리겠습니다."</item>
+        <item>"나중에 전화해 주세요."</item>
+    </string-array>
+
+</resources>

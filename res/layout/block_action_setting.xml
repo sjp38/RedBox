@@ -142,12 +142,10 @@
         </CheckBox>
     </LinearLayout>
 
-    <EditText
+    <org.clc.android.app.redbox.widget.SmsEditWidget
         android:id="@+id/autoSMSeditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:hint="@string/setting_hint_auto_sms_editfield" >
-    </EditText>
-
+        android:layout_marginTop="5dp" >
+    </org.clc.android.app.redbox.widget.SmsEditWidget>
 </LinearLayout>

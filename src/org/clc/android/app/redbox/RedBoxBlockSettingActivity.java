@@ -17,6 +17,7 @@ import com.example.android.actionbarcompat.ActionBarActivity;
 import org.clc.android.app.redbox.data.BlockSetting;
 import org.clc.android.app.redbox.data.DataManager;
 import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
+import org.clc.android.app.redbox.widget.SmsEditWidget;
 
 public class RedBoxBlockSettingActivity extends ActionBarActivity implements
         View.OnClickListener {
@@ -75,7 +76,7 @@ public class RedBoxBlockSettingActivity extends ActionBarActivity implements
         sendAutoSMSCheckBox.setChecked(setting.mSendAutoSMS);
 
         if (!setting.mAutoSMS.equals("")) {
-            final EditText autoSMS = (EditText) findViewById(R.id.autoSMSeditText);
+            final SmsEditWidget autoSMS = (SmsEditWidget) findViewById(R.id.autoSMSeditText);
             autoSMS.setText(setting.mAutoSMS);
         }
     }
@@ -149,7 +150,7 @@ public class RedBoxBlockSettingActivity extends ActionBarActivity implements
         final CheckBox rejectCallCheckBox = (CheckBox) findViewById(R.id.rejectCallcheckBox);
         final CheckBox deleteCallLogCheckBox = (CheckBox) findViewById(R.id.deleteCallLogCheckBox);
         final CheckBox sendAutoSMSCheckBox = (CheckBox) findViewById(R.id.sendAutoSMSCheckBox);
-        final EditText autoSMS = (EditText) findViewById(R.id.autoSMSeditText);
+        final SmsEditWidget autoSMS = (SmsEditWidget) findViewById(R.id.autoSMSeditText);
 
         final String aliasValue = alias.getText().toString();
         final String numberValue = number.getText().toString();

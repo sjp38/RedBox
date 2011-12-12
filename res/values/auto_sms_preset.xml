@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="auto_sms_preset">
+        <item>"Sorry, I'm busy now."</item>
+        <item>"I'm in meeting."</item>
+        <item>"I'm sleeping."</item>
+        <item>"I can't take your call, right now."</item>
+        <item>"If you leave message with SMS or e-mail, I will contact you soon."</item>
+        <item>"Call me later, please."</item>
+    </string-array>
+
+</resources>
