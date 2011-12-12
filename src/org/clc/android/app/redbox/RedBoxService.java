@@ -1,3 +1,4 @@
+
 package org.clc.android.app.redbox;
 
 import java.lang.reflect.Method;
@@ -36,19 +37,24 @@ public class RedBoxService extends Service {
         public void onCallStateChanged(int state, String incomingNumber) {
             if (state == TelephonyManager.CALL_STATE_RINGING) {
                 incomingNumber = DataManager.getParsedNumber(incomingNumber);
-                final ArrayList<PatternSetting> settings = DataManager
-                        .getInstance().getPatterns();
-                for (PatternSetting setting : settings) {
-                    if (setting.matches(incomingNumber)) {
-                        execute(setting, incomingNumber);
-                    }
-                }
-                BlockSetting setting = DataManager.getInstance()
+
+                // Check number rules.
+                final BlockSetting setting = DataManager.getInstance()
                         .getBlockSetting(incomingNumber);
-                if (setting == null) {
+                if (setting != null) {
+                    execute(setting, incomingNumber);
                     return;
                 }
-                execute(setting, incomingNumber);
+
+                // Check pattern rules.
+                final ArrayList<PatternSetting> settings = DataManager
+                        .getInstance().getPatterns();
+                for (PatternSetting patternSetting : settings) {
+                    if (patternSetting.matches(incomingNumber)) {
+                        execute(patternSetting, incomingNumber);
+                        return;
+                    }
+                }
             }
         }
     };
@@ -133,8 +139,10 @@ public class RedBoxService extends Service {
         }
     }
 
-    public static final String[] CALL_PROJECTION = { CallLog.Calls._ID,
-            CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.DURATION };
+    public static final String[] CALL_PROJECTION = {
+            CallLog.Calls._ID,
+            CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.DURATION
+    };
 
     private static final int DEL_CALL_LOG_MESSAGE = 1;
     private static final long CALL_LOG_CREATION_WAIT_TIME = 2000;
