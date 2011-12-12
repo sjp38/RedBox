@@ -124,6 +124,13 @@ public class RedBoxPatternSettingActivity extends ActionBarActivity {
         mEndWithEditText = (EditText) findViewById(R.id.pattern_setting_endWith_input);
         mAllCheckBox = (CheckBox) findViewById(R.id.pattern_setting_all_checkbox);
         mPhoneNumberEditor = (PhoneNumberEditWidget) findViewById(R.id.number_input_textView);
+        mPhoneNumberEditor
+                .setOnNumberSelectedListener(new PhoneNumberEditWidget.OnNumberSelectedListener() {
+                    @Override
+                    public void onNumberSelected() {
+                        onAddNumberClicked(null);
+                    }
+                });
 
         mAliasTextView.setOnClickListener(mAliasClickListener);
         mAllCheckBox.setOnCheckedChangeListener(mAllCheckBoxListener);

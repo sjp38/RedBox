@@ -111,6 +111,13 @@ public class RedBoxActivity extends ActionBarActivity implements
         mNumbersListView.setAdapter(mAdapter);
 
         mPhoneNumberEditor = (PhoneNumberEditWidget) findViewById(R.id.number_input_textView);
+        mPhoneNumberEditor
+                .setOnNumberSelectedListener(new PhoneNumberEditWidget.OnNumberSelectedListener() {
+                    @Override
+                    public void onNumberSelected() {
+                        onAddNumberClicked(null);
+                    }
+                });
 
         Context context = getApplicationContext();
         context.startService(new Intent(context, RedBoxService.class));

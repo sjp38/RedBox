@@ -1,10 +1,5 @@
+
 package org.clc.android.app.redbox.widget;
-
-import java.util.ArrayList;
-
-import org.clc.android.app.redbox.R;
-import org.clc.android.app.redbox.RedBoxService;
-import org.clc.android.app.redbox.data.BlockSetting;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,6 +20,12 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import org.clc.android.app.redbox.R;
+import org.clc.android.app.redbox.RedBoxService;
+import org.clc.android.app.redbox.data.BlockSetting;
+
+import java.util.ArrayList;
+
 public class PhoneNumberEditWidget extends LinearLayout {
     private static final String PHONE_NUMBER_SEPERATOR = ",";
     private static final String ALIAS_SEPERATOR = ":";
@@ -40,6 +41,8 @@ public class PhoneNumberEditWidget extends LinearLayout {
 
     private EditText mPhonenumberEditText = null;
     private Button mMenuButton = null;
+
+    private ArrayList<OnNumberSelectedListener> mListeners = new ArrayList<OnNumberSelectedListener>();
 
     private View.OnClickListener mMenuButtonClickListener = new View.OnClickListener() {
 
@@ -139,6 +142,8 @@ public class PhoneNumberEditWidget extends LinearLayout {
                 @Override
                 public void onClick(DialogInterface dialog, int item) {
                     mPhonenumberEditText.setText(numbers[item]);
+                    notifyNumberSelected();
+
                 }
             });
         } else {
@@ -167,6 +172,7 @@ public class PhoneNumberEditWidget extends LinearLayout {
                             }
                             addNumber += CONTACT_SEPERATOR;
                             mPhonenumberEditText.setText(addNumber);
+                            notifyNumberSelected();
                         }
                     });
         }
@@ -269,5 +275,25 @@ public class PhoneNumberEditWidget extends LinearLayout {
             }
         }
         return settings;
+    }
+
+    private void notifyNumberSelected() {
+        for (OnNumberSelectedListener listener : mListeners) {
+            listener.onNumberSelected();
+        }
+    }
+
+    public void setOnNumberSelectedListener(OnNumberSelectedListener listener) {
+        mListeners.add(listener);
+    }
+
+    /**
+     * Call back interface for number selected event. When user select number
+     * from contact / call log, this will be called.
+     * 
+     * @author sj38.park
+     */
+    public interface OnNumberSelectedListener {
+        public void onNumberSelected();
     }
 }
