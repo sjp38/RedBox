@@ -2,7 +2,6 @@
 package org.clc.android.app.redbox;
 
 import android.content.Context;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -146,6 +145,9 @@ public class RedBoxHistoryActivity extends ActionBarActivity implements
             String ruleName = rule.mAlias;
             if (ruleName == null || "".equals(ruleName)) {
                 ruleName = rule.mNumber;
+            }
+            if (ruleName == null || "".equals(ruleName)) {
+                ruleName = getResources().getString(R.string.pattern_unnamed);
             }
             matchedBy
                     .setText(getString(R.string.record_matched_rule, ruleName));
