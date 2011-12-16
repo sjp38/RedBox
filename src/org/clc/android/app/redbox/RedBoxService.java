@@ -37,13 +37,14 @@ public class RedBoxService extends Service {
         public void onCallStateChanged(int state, String incomingNumber) {
             if (state == TelephonyManager.CALL_STATE_RINGING) {
                 incomingNumber = DataManager.getParsedNumber(incomingNumber);
-
-                // Check number rules.
-                final BlockSetting setting = DataManager.getInstance()
-                        .getBlockSetting(incomingNumber);
-                if (setting != null) {
-                    execute(setting, incomingNumber);
-                    return;
+                if (DataManager.getInstance().isValid(incomingNumber)) {
+                    // Check number rules.
+                    final BlockSetting setting = DataManager.getInstance()
+                            .getBlockSetting(incomingNumber);
+                    if (setting != null) {
+                        execute(setting, incomingNumber);
+                        return;
+                    }
                 }
 
                 // Check pattern rules.
