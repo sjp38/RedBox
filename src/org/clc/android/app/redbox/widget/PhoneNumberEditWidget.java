@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -40,7 +41,7 @@ public class PhoneNumberEditWidget extends LinearLayout {
     private boolean mNoAddPatternMenu = false;
 
     private EditText mPhonenumberEditText = null;
-    private Button mMenuButton = null;
+    private ImageButton mMenuButton = null;
 
     private ArrayList<OnNumberSelectedListener> mListeners = new ArrayList<OnNumberSelectedListener>();
 
@@ -103,7 +104,7 @@ public class PhoneNumberEditWidget extends LinearLayout {
         inflater.inflate(R.layout.phonenumber_edit_widget_layout, this, true);
 
         mPhonenumberEditText = (EditText) findViewById(R.id.phonenumber_editText);
-        mMenuButton = (Button) findViewById(R.id.phonenumber_edit_menu_button);
+        mMenuButton = (ImageButton) findViewById(R.id.phonenumber_edit_menu_button);
 
         mMenuButton.setOnClickListener(mMenuButtonClickListener);
     }

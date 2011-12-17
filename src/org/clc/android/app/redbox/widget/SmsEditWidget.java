@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -25,7 +26,7 @@ public class SmsEditWidget extends LinearLayout implements TextWatcher {
     private static final int MAX_MESSAGE_LENGTH = 280;
 
     private EditText mSmsEditText;
-    private Button mMenuButton;
+    private ImageButton mMenuButton;
     private TextView mCurrentLengthTextView;
 
     private View.OnClickListener mMenuButtonClickListener = new View.OnClickListener() {
@@ -81,7 +82,7 @@ public class SmsEditWidget extends LinearLayout implements TextWatcher {
         inflater.inflate(R.layout.sms_edit_widget_layout, this, true);
 
         mSmsEditText = (EditText) findViewById(R.id.sms_editText);
-        mMenuButton = (Button) findViewById(R.id.sms_edit_menu_button);
+        mMenuButton = (ImageButton) findViewById(R.id.sms_edit_menu_button);
         mCurrentLengthTextView = (TextView) findViewById(R.id.sms_textLength);
 
         mSmsEditText.addTextChangedListener(this);
