@@ -12,7 +12,7 @@
         android:layout_weight="1"
         android:hint="@string/setting_hint_auto_sms_editfield" >
 
-        <requestFocus >
+        <requestFocus>
         </requestFocus>
     </EditText>
 
@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="@drawable/phonenumber_edit_widget_menu"/>
+            android:background="@drawable/phonenumber_edit_widget_menu" />
 
         <TextView
             android:id="@+id/sms_textLength"
@@ -36,7 +36,6 @@
             android:layout_gravity="bottom"
             android:gravity="right"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
     </LinearLayout>
 
 </LinearLayout>
