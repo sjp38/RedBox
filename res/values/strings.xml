@@ -5,9 +5,6 @@
     <string name="pattern_setting_activity_label">Pattern setting</string>
     <string name="history_activity_label">Recent history</string>
 
-    <string name="number_input_hint">Insert number.
-    </string>
-
     <string name="menu_action_log">Action log</string>
 
     <string-array name="menu_list_phonenumber_edit_widget">
@@ -23,24 +20,12 @@
     <string name="add_number_button">Add</string>
 
     <string name="error_duplicate_number">Same number already exist in list.</string>
-    <string name="wait_next_update">Still working. Please wait for next update, or
-        contribute ;)</string>
     <string name="error_while_pick_contact">Error while pick contact.</string>
     <string name="error_blank_number">Blank number can\'t be added.</string>
     <string name="error_wrong_number">Wrong number. Number can has digit, -, +, (, ) only.</string>
 
     <string name="title_select_number">Select numbers to add.</string>
     <string name="error_blank_contact">Selected contact has no phone number.</string>
-
-    <string name="notify_will_reject_call">Will reject call from this number.</string>
-    <string name="notify_will_delte_call_log">Will delete call log from this number.</string>
-    <string name="notify_will_send_auto_sms">Will send Message when call comes from this
-        number.</string>
-    <string name="notify_will_not_reject_call">Will not reject call from this number.</string>
-    <string name="notify_will_not_delte_call_log">Will not delete call log from this number.
-    </string>
-    <string name="notify_will_not_send_auto_sms">Will not send Message when call comes from this
-        number.</string>
 
     <string name="setting_alias_name_description">Alias and number pattern. Touch to change.
     </string>

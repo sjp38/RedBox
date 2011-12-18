@@ -12,13 +12,11 @@
         android:background="#ff333333" />
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:baselineAligned="true" >
 
         <LinearLayout
-            android:id="@+id/linearLayout4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -58,13 +56,11 @@
         android:background="#ff333333" />
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:baselineAligned="true" >
 
         <LinearLayout
-            android:id="@+id/linearLayout4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -72,7 +68,7 @@
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/rejectCallTitle"
+                android:id="@+id/deleteCallLogTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/setting_delete_call_log_title"
@@ -80,7 +76,7 @@
             </TextView>
 
             <TextView
-                android:id="@+id/rejectCallDescription"
+                android:id="@+id/deleteCallLogDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/setting_delete_call_log_description" >
@@ -104,13 +100,11 @@
         android:background="#ff333333" />
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:baselineAligned="true" >
 
         <LinearLayout
-            android:id="@+id/linearLayout4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -118,7 +112,7 @@
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/rejectCallTitle"
+                android:id="@+id/sendAutoSMSTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/setting_send_auto_sms_title"
@@ -126,7 +120,7 @@
             </TextView>
 
             <TextView
-                android:id="@+id/rejectCallDescription"
+                android:id="@+id/sendAutoSMSDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/setting_send_auto_sms_description" >

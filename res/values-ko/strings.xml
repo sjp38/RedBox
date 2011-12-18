@@ -5,8 +5,6 @@
     <string name="pattern_setting_activity_label">패턴 설정</string>
     <string name="history_activity_label">최근 기록</string>
 
-    <string name="number_input_hint">전화번호를 입력하세요.</string>
-
     <string name="menu_action_log">동작 기록</string>
 
     <string-array name="menu_list_phonenumber_edit_widget">
@@ -22,20 +20,12 @@
     <string name="add_number_button">추가</string>
 
     <string name="error_duplicate_number">같은 번호가 이미 목록에 존재합니다.</string>
-    <string name="warning_wait_next_update">작업 중입니다. 다음 update 를 기다려 주세요 ;)</string>
     <string name="error_while_pick_contact">Contact 정보를 가져오는 중 문제가 발생했습니다.</string>
     <string name="error_blank_number">빈 번호는 입력될 수 없습니다.</string>
     <string name="error_wrong_number">잘못된 형식의 번호입니다. 번호는 숫자, -, +, (, ) 만으로 구성되어야 합니다.</string>
 
     <string name="title_select_number">추가할 번호를 선택하세요.</string>
     <string name="error_blank_contact">선택하신 연락처에는 전화 번호가 존재하지 않습니다.</string>
-
-    <string name="notify_will_reject_call">이 번호로부터의 전화가 걸려오면 곧바로 끊습니다.</string>
-    <string name="notify_will_delte_call_log">이 번호로부터 전화가 걸려오면 해당 콜로그를 지웁니다.</string>
-    <string name="notify_will_send_auto_sms">이 번호로부터 전화가 걸려오면 자동으로 메세지를 보냅니다.</string>
-    <string name="notify_will_not_reject_call">이 번호로부터 전화가 걸려와도 끊지 않습니다.</string>
-    <string name="notify_will_not_delte_call_log">이 번호로부터 전화가 걸려와도 해당 콜로그를 지우지 않습니다.</string>
-    <string name="notify_will_not_send_auto_sms">이 번호로부터 전화가 걸려와도 자동으로 메세지를 보내지 않습니다.</string>
 
     <string name="setting_alias_name_description">설정할 명칭과 번호입니다. 수정하시려면 터치하세요 .</string>
     <string name="setting_reject_call_title">전화 끊기</string>
