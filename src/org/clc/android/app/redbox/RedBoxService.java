@@ -42,8 +42,9 @@ public class RedBoxService extends Service {
                     final BlockSetting setting = DataManager.getInstance()
                             .getBlockSetting(parsedIncomingNumber);
                     if (setting != null) {
-                        execute(setting, incomingNumber);
-                        return;
+                        if (execute(setting, incomingNumber)) {
+                            return;
+                        }
                     }
                 }
 
@@ -52,8 +53,9 @@ public class RedBoxService extends Service {
                         .getInstance().getPatterns();
                 for (PatternSetting patternSetting : settings) {
                     if (patternSetting.matches(parsedIncomingNumber)) {
-                        execute(patternSetting, incomingNumber);
-                        return;
+                        if (execute(patternSetting, incomingNumber)) {
+                            return;
+                        }
                     }
                 }
             }
@@ -85,7 +87,7 @@ public class RedBoxService extends Service {
         return null;
     }
 
-    private void execute(BlockSetting setting, String incomingNumber) {
+    private boolean execute(BlockSetting setting, String incomingNumber) {
         boolean worked = false;
         if (setting.mRejectCall) {
             endCall();
@@ -101,7 +103,7 @@ public class RedBoxService extends Service {
         }
 
         if (!worked) {
-            return;
+            return worked;
         }
         try {
             BlockSetting copiedSetting = (BlockSetting) setting.clone();
@@ -118,6 +120,7 @@ public class RedBoxService extends Service {
         } catch (CloneNotSupportedException e) {
             Log.e(TAG, "Failed to copy block setting for history." + e);
         }
+        return worked;
     }
 
     private void startPhoneStateMonitoring() {
