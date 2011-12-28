@@ -143,8 +143,10 @@ public class RedBoxHistoryActivity extends ActionBarActivity implements
             when.setText(format.format(timeStamp));
 
             String ruleName = rule.mAlias;
-            if (ruleName == null || "".equals(ruleName)) {
-                ruleName = rule.mNumber;
+            if (!(rule instanceof PatternSetting)) {
+                if (ruleName == null || "".equals(ruleName)) {
+                    ruleName = rule.mNumber;
+                }
             }
             if (ruleName == null || "".equals(ruleName)) {
                 ruleName = getResources().getString(R.string.pattern_unnamed);
