@@ -36,11 +36,11 @@ public class RedBoxService extends Service {
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
             if (state == TelephonyManager.CALL_STATE_RINGING) {
-                incomingNumber = DataManager.getParsedNumber(incomingNumber);
-                if (DataManager.getInstance().isValid(incomingNumber)) {
+                final String parsedIncomingNumber = DataManager.getParsedNumber(incomingNumber);
+                if (DataManager.getInstance().isValid(parsedIncomingNumber)) {
                     // Check number rules.
                     final BlockSetting setting = DataManager.getInstance()
-                            .getBlockSetting(incomingNumber);
+                            .getBlockSetting(parsedIncomingNumber);
                     if (setting != null) {
                         execute(setting, incomingNumber);
                         return;
@@ -51,7 +51,7 @@ public class RedBoxService extends Service {
                 final ArrayList<PatternSetting> settings = DataManager
                         .getInstance().getPatterns();
                 for (PatternSetting patternSetting : settings) {
-                    if (patternSetting.matches(incomingNumber)) {
+                    if (patternSetting.matches(parsedIncomingNumber)) {
                         execute(patternSetting, incomingNumber);
                         return;
                     }

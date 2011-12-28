@@ -19,8 +19,8 @@ public class PatternSetting extends BlockSetting implements Serializable {
             String autoSMS) {
         super();
         mAlias = alias;
-        mStartPattern = DataManager.getParsedNumber(startPattern);
-        mEndPattern = DataManager.getParsedNumber(endPattern);
+        mStartPattern = startPattern;
+        mEndPattern = endPattern;
         mAllNumber = allNumber;
         mExceptions = exceptions;
         mRejectCall = rejectCall;
@@ -38,10 +38,14 @@ public class PatternSetting extends BlockSetting implements Serializable {
         if (mAllNumber) {
             return true;
         }
-        if (!"".equals(mStartPattern) && parsedNumber.startsWith(mStartPattern)) {
+
+        String parsedStartPattern = DataManager.getParsedNumber(mStartPattern);
+        if (!"".equals(parsedStartPattern) && parsedNumber.startsWith(parsedStartPattern)) {
             return true;
         }
-        if (!"".equals(mEndPattern) && parsedNumber.endsWith(mEndPattern)) {
+
+        String parsedEndPattern = DataManager.getParsedNumber(mEndPattern);
+        if (!"".equals(parsedEndPattern) && parsedNumber.endsWith(parsedEndPattern)) {
             return true;
         }
 

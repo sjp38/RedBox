@@ -37,6 +37,9 @@ public class DataManager {
             "+", "-", " ", "(", ")"
     };
 
+    public static final String INTERNATIONAL_MARK = "+";
+    public static final String INTERNATIONAL_MARK_ENCODED = "-";
+
     private static DataManager mSingleton = null;
 
     private BlockSettingsManager mBlockManager = null;
@@ -119,6 +122,10 @@ public class DataManager {
 
     public static boolean isValid(String number) {
         String parsedNumber = getParsedNumber(number);
+        if (parsedNumber.startsWith(INTERNATIONAL_MARK_ENCODED)) {
+            parsedNumber = parsedNumber.substring(INTERNATIONAL_MARK_ENCODED.length(),
+                    parsedNumber.length());
+        }
         return parsedNumber.matches("\\d+");
     }
 
@@ -127,10 +134,20 @@ public class DataManager {
     }
 
     public static String getParsedNumber(final String number) {
+        boolean isInternationalNumber = false;
+        if (number.startsWith(INTERNATIONAL_MARK)) {
+            isInternationalNumber = true;
+        }
+
         String parsed = number;
+        parsed = parsed.replace(INTERNATIONAL_MARK, INTERNATIONAL_MARK_ENCODED);
 
         for (String seperator : NUMBER_SEPERATORS) {
             parsed = parsed.replace(seperator, "");
+        }
+
+        if (isInternationalNumber) {
+            parsed = INTERNATIONAL_MARK_ENCODED + parsed;
         }
         return parsed;
     }
