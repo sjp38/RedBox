@@ -5,6 +5,7 @@
     <string name="pattern_setting_activity_label">Pattern setting</string>
     <string name="history_activity_label">Recent history</string>
     <string name="group_setting_activity_label">Group setting</string>
+    <string name="suggestion_activity_label">Suggesetions</string>
 
     <string name="menu_action_log">Action log</string>
     <string name="menu_action_add">Add</string>
@@ -89,4 +90,8 @@
     <string name="record_sent_auto_sms">Sent below auto SMS.</string>
 
     <string name="can_not_find_this_rule">can not find this rule. Maybe modified or deleted.</string>
+
+    <string name="suggestion_add_dialog_title">Add suggestion</string>
+    <string name="suggestion_edit_dialog_title">Edit suggestion</string>
+    <string name="warning_suggestion_should_not_empty">Suggestion should not be empty.</string>
 </resources>

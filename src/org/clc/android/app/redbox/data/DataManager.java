@@ -7,6 +7,7 @@ import org.clc.android.app.redbox.data.ActionHistoryManager.OnHistoryChangeListe
 import org.clc.android.app.redbox.data.BlockSettingsManager.OnBlockSettingChangeListener;
 import org.clc.android.app.redbox.data.GroupRulesManager.OnGroupRulesChangeListener;
 import org.clc.android.app.redbox.data.PatternSettingsManager.OnPatternSettingChangeListener;
+import org.clc.android.app.redbox.data.SuggestionsManager.OnSuggestionChangedListener;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,6 +48,7 @@ public class DataManager {
     private PatternSettingsManager mPatternManager = null;
     private ActionHistoryManager mHistoryManager = null;
     private GroupRulesManager mGroupsManager = null;
+    private SuggestionsManager mSuggestionsManager = null;
 
     private boolean mDataLoaded = false;
 
@@ -55,6 +57,7 @@ public class DataManager {
         mBlockManager = new BlockSettingsManager();
         mHistoryManager = new ActionHistoryManager();
         mGroupsManager = new GroupRulesManager();
+        mSuggestionsManager = new SuggestionsManager();
         loadDatas();
     }
 
@@ -81,6 +84,7 @@ public class DataManager {
         ArrayList<PatternSetting> patternSettings = null;
         ArrayList<ActionRecord> actionRecords = null;
         ArrayList<GroupRule> groupRules = null;
+        ArrayList<String> suggestions = null;
         try {
             Log.i(TAG, "load setting data.");
             fis = new FileInputStream(file);
@@ -92,6 +96,7 @@ public class DataManager {
             actionRecords = (ArrayList<ActionRecord>) serialized
                     .readObject();
             groupRules = (ArrayList<GroupRule>) serialized.readObject();
+            suggestions = (ArrayList<String>) serialized.readObject();
 
         } catch (IOException e) {
             Log.e(TAG, "IOException while read data file!", e);
@@ -125,6 +130,9 @@ public class DataManager {
             if (groupRules != null) {
                 mGroupsManager.setDatas(groupRules);
             }
+            if (suggestions != null) {
+                mSuggestionsManager.setData(suggestions);
+            }
 
             mDataLoaded = true;
         }
@@ -144,6 +152,7 @@ public class DataManager {
             serialized.writeObject(mPatternManager.getDatas());
             serialized.writeObject(mHistoryManager.getDatas());
             serialized.writeObject(mGroupsManager.getDatas());
+            serialized.writeObject(mSuggestionsManager.getData());
             serialized.flush();
             serialized.close();
             fos.close();
@@ -348,6 +357,30 @@ public class DataManager {
                 send);
     }
 
+    public String getSuggestion(int position) {
+        return mSuggestionsManager.get(position);
+    }
+
+    public void updateSuggestion(int position, String suggestion) {
+        mSuggestionsManager.update(position, suggestion);
+    }
+
+    public void deleteSuggestion(int position) {
+        mSuggestionsManager.delete(position);
+    }
+
+    public void addSuggestion(String suggestion) {
+        mSuggestionsManager.add(suggestion);
+    }
+
+    public int getSuggestionsCount() {
+        return mSuggestionsManager.getCount();
+    }
+
+    public void updateSuggestionPriority(int position) {
+        mSuggestionsManager.updatePriority(position);
+    }
+
     public void setOnBlockSettingChangeListener(
             OnBlockSettingChangeListener listener) {
         mBlockManager.setOnBlockSettingChangeListener(listener);
@@ -364,6 +397,10 @@ public class DataManager {
 
     public void setOnGroupRulesChangeListener(OnGroupRulesChangeListener listener) {
         mGroupsManager.setOnGroupRulesChangeListener(listener);
+    }
+
+    public void setOnSuggestionsChangedListener(OnSuggestionChangedListener listener) {
+        mSuggestionsManager.setOnSuggestionChangedListener(listener);
     }
 
     public int getId(final BlockSetting rule) {

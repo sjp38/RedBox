@@ -24,6 +24,7 @@ public class RedBoxBlockSettingActivity extends ActionBarActivity implements
     private static final String TAG = "RedBox block setting";
     private int mId = 0;
     private PhoneNumberEditWidget mPhoneNumberEditor = null;
+    private SmsEditWidget mSmsEditWidget = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,10 @@ public class RedBoxBlockSettingActivity extends ActionBarActivity implements
                             new RuntimeException(""));
                 }
                 break;
+            case SmsEditWidget.RESULT_FOR_SUGGESTION:
+                if (mSmsEditWidget != null) {
+                    mSmsEditWidget.onSuggestionPicked(resultCode, data);
+                }
             default:
                 break;
         }
@@ -75,9 +80,9 @@ public class RedBoxBlockSettingActivity extends ActionBarActivity implements
         deleteCallLogCheckBox.setChecked(setting.mDeleteCallLog);
         sendAutoSMSCheckBox.setChecked(setting.mSendAutoSMS);
 
+        mSmsEditWidget = (SmsEditWidget) findViewById(R.id.autoSMSeditText);
         if (!setting.mAutoSMS.equals("")) {
-            final SmsEditWidget autoSMS = (SmsEditWidget) findViewById(R.id.autoSMSeditText);
-            autoSMS.setText(setting.mAutoSMS);
+            mSmsEditWidget.setText(setting.mAutoSMS);
         }
     }
 
@@ -150,14 +155,13 @@ public class RedBoxBlockSettingActivity extends ActionBarActivity implements
         final CheckBox rejectCallCheckBox = (CheckBox) findViewById(R.id.rejectCallcheckBox);
         final CheckBox deleteCallLogCheckBox = (CheckBox) findViewById(R.id.deleteCallLogCheckBox);
         final CheckBox sendAutoSMSCheckBox = (CheckBox) findViewById(R.id.sendAutoSMSCheckBox);
-        final SmsEditWidget autoSMS = (SmsEditWidget) findViewById(R.id.autoSMSeditText);
 
         final String aliasValue = alias.getText().toString();
         final String numberValue = number.getText().toString();
         final boolean rejectCallValue = rejectCallCheckBox.isChecked();
         final boolean deleteCallLogValue = deleteCallLogCheckBox.isChecked();
         final boolean sendAutoSMSValue = sendAutoSMSCheckBox.isChecked();
-        final String autoSMSValue = autoSMS.getText().toString();
+        final String autoSMSValue = mSmsEditWidget.getText().toString();
 
         return new BlockSetting(aliasValue, numberValue,
                 rejectCallValue, deleteCallLogValue, sendAutoSMSValue,

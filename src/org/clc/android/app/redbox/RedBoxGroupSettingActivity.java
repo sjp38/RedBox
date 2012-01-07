@@ -80,6 +80,10 @@ public class RedBoxGroupSettingActivity extends Activity {
             case PhoneNumberEditWidget.PICK_CONTACT_REQUEST:
                 mPhoneNumberEditor.onContactActivityResult(resultCode, data);
                 break;
+            case SmsEditWidget.RESULT_FOR_SUGGESTION:
+                if (mAutoSMSEditWidget != null) {
+                    mAutoSMSEditWidget.onSuggestionPicked(resultCode, data);
+                }
             default:
                 break;
         }

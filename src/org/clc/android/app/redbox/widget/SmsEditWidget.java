@@ -1,29 +1,26 @@
 
 package org.clc.android.app.redbox.widget;
 
-import android.app.AlertDialog;
+import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.clc.android.app.redbox.R;
-import org.clc.android.app.redbox.data.BlockSetting;
-import org.clc.android.app.redbox.data.DataManager;
-
-import java.util.ArrayList;
+import org.clc.android.app.redbox.RedBoxSuggestionActivity;
 
 public class SmsEditWidget extends LinearLayout implements TextWatcher {
     private static final int MAX_MESSAGE_LENGTH = 280;
+    public static final int RESULT_FOR_SUGGESTION = 2;
 
     private EditText mSmsEditText;
     private ImageButton mMenuButton;
@@ -33,36 +30,10 @@ public class SmsEditWidget extends LinearLayout implements TextWatcher {
 
         @Override
         public void onClick(View v) {
-            final ArrayList<CharSequence> totalItems = new ArrayList<CharSequence>();
-            for (int i = 0; i < DataManager.getInstance().getSize(); i++) {
-                BlockSetting setting = DataManager.getInstance().get(i);
-                if (!"".equals(setting.mAutoSMS)) {
-                    totalItems.add(setting.mAutoSMS);
-                }
-            }
-
-            final CharSequence[] items;
-            items = getContext().getResources().getTextArray(
-                    R.array.auto_sms_preset);
-            for (int i = items.length-1; i >= 0; i--) {
-                totalItems.add(0, items[i]);
-            }
-            final CharSequence[] totalArray = totalItems
-                    .toArray(new CharSequence[totalItems.size()]);
-
-            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setItems(totalArray, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String insertText = mSmsEditText.getText().toString();
-                    if (!"".equals(insertText)) {
-                        insertText += "\n";
-                    }
-                    mSmsEditText.setText(insertText + totalArray[which]);
-                    mSmsEditText.setSelection(mSmsEditText.getText().length());
-                }
-            });
-            builder.show();
+            final Intent intent = new Intent();
+            intent.setClassName("org.clc.android.app.redbox",
+                    "org.clc.android.app.redbox.RedBoxSuggestionActivity");
+            ((Activity) getContext()).startActivityForResult(intent, RESULT_FOR_SUGGESTION);
         }
     };
 
@@ -112,5 +83,18 @@ public class SmsEditWidget extends LinearLayout implements TextWatcher {
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         final int currentLength = mSmsEditText.getText().toString().length();
         mCurrentLengthTextView.setText(currentLength + "/" + MAX_MESSAGE_LENGTH);
+    }
+
+    public void onSuggestionPicked(int result, Intent data) {
+        if (result != Activity.RESULT_OK) {
+            return;
+        }
+        final String suggestion = data.getStringExtra(RedBoxSuggestionActivity.SUGGESTION_EXTRA);
+        final int selectionEnd = mSmsEditText.getSelectionEnd();
+        final String formerText = mSmsEditText.getText().toString();
+        final String next = formerText.substring(0, selectionEnd) + suggestion
+                + formerText.substring(selectionEnd, formerText.length());
+        mSmsEditText.setText(next);
+
     }
 }

@@ -33,6 +33,7 @@ public class RedBoxPatternSettingActivity extends ActionBarActivity {
     private EditText mEndWithEditText = null;
     private CheckBox mAllCheckBox = null;
     private PhoneNumberEditWidget mPhoneNumberEditor = null;
+    private SmsEditWidget mSmsEditWidget = null;
 
     private int mId = -1;
     private ArrayList<ExceptionNumber> mExceptions = new ArrayList<ExceptionNumber>();
@@ -79,6 +80,10 @@ public class RedBoxPatternSettingActivity extends ActionBarActivity {
             case PhoneNumberEditWidget.PICK_CONTACT_REQUEST:
                 mPhoneNumberEditor.onContactActivityResult(resultCode, data);
                 break;
+            case SmsEditWidget.RESULT_FOR_SUGGESTION:
+                if (mSmsEditWidget != null) {
+                    mSmsEditWidget.onSuggestionPicked(resultCode, data);
+                }
             default:
                 break;
         }
@@ -149,12 +154,12 @@ public class RedBoxPatternSettingActivity extends ActionBarActivity {
             final CheckBox rejectCallCheckBox = (CheckBox) findViewById(R.id.rejectCallcheckBox);
             final CheckBox deleteCallLogCheckBox = (CheckBox) findViewById(R.id.deleteCallLogCheckBox);
             final CheckBox sendAutoSMSCheckBox = (CheckBox) findViewById(R.id.sendAutoSMSCheckBox);
-            final SmsEditWidget autoSMSEditText = (SmsEditWidget) findViewById(R.id.autoSMSeditText);
+            mSmsEditWidget = (SmsEditWidget) findViewById(R.id.autoSMSeditText);
 
             rejectCallCheckBox.setChecked(setting.mRejectCall);
             deleteCallLogCheckBox.setChecked(setting.mDeleteCallLog);
             sendAutoSMSCheckBox.setChecked(setting.mSendAutoSMS);
-            autoSMSEditText.setText(setting.mAutoSMS);
+            mSmsEditWidget.setText(setting.mAutoSMS);
 
             final ArrayList<ExceptionNumber> exceptions = setting.mExceptions;
             for (ExceptionNumber exception : exceptions) {
@@ -246,12 +251,12 @@ public class RedBoxPatternSettingActivity extends ActionBarActivity {
         final CheckBox rejectCallCheckBox = (CheckBox) findViewById(R.id.rejectCallcheckBox);
         final CheckBox deleteCallLogCheckBox = (CheckBox) findViewById(R.id.deleteCallLogCheckBox);
         final CheckBox sendAutoSMSCheckBox = (CheckBox) findViewById(R.id.sendAutoSMSCheckBox);
-        final SmsEditWidget autoSMSEditText = (SmsEditWidget) findViewById(R.id.autoSMSeditText);
+        mSmsEditWidget = (SmsEditWidget) findViewById(R.id.autoSMSeditText);
 
         final boolean rejectCall = rejectCallCheckBox.isChecked();
         final boolean deleteCallLog = deleteCallLogCheckBox.isChecked();
         final boolean sendAutoSMS = sendAutoSMSCheckBox.isChecked();
-        final String autoSMS = autoSMSEditText.getText().toString();
+        final String autoSMS = mSmsEditWidget.getText().toString();
 
         return new PatternSetting(alias, startWith,
                 endWith, allNumber, exceptions, rejectCall, deleteCallLog,
