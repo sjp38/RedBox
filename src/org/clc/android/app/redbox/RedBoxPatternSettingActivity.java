@@ -135,8 +135,6 @@ public class RedBoxPatternSettingActivity extends ActionBarActivity {
         mAliasTextView.setOnClickListener(mAliasClickListener);
         mAllCheckBox.setOnCheckedChangeListener(mAllCheckBoxListener);
 
-        mPhoneNumberEditor.setNoAddPatternMenu(true);
-
         final Button deleteButton = (Button) findViewById(R.id.delete);
         if (mId == -1) {
             deleteButton.setEnabled(false);

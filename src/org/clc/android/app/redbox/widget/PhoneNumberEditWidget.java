@@ -35,10 +35,8 @@ public class PhoneNumberEditWidget extends LinearLayout {
 
     private static final int FROM_CONTACT_MENU = 0;
     private static final int FROM_CALL_LOG_MENU = 1;
-    private static final int ADD_PATTERN_MENU = 2;
 
     private boolean mSingleNumber = false;
-    private boolean mNoAddPatternMenu = false;
 
     private EditText mPhonenumberEditText = null;
     private ImageButton mMenuButton = null;
@@ -50,15 +48,8 @@ public class PhoneNumberEditWidget extends LinearLayout {
         @Override
         public void onClick(View v) {
             final CharSequence[] items;
-            if (!mNoAddPatternMenu) {
-                items = getContext().getResources().getTextArray(
-                        R.array.menu_list_phonenumber_edit_widget);
-            } else {
-                items = getContext()
-                        .getResources()
-                        .getTextArray(
-                                R.array.menu_list_without_add_pattern_phonenumber_edit_widget);
-            }
+            items = getContext().getResources().getTextArray(
+                    R.array.menu_list_phonenumber_edit_widget);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -71,8 +62,6 @@ public class PhoneNumberEditWidget extends LinearLayout {
                         case FROM_CALL_LOG_MENU:
                             onGetNumberFromCallLogClicked();
                             break;
-                        case ADD_PATTERN_MENU:
-                            onAddPatternMenuClicked();
                         default:
                             break;
                     }
@@ -125,10 +114,6 @@ public class PhoneNumberEditWidget extends LinearLayout {
      */
     public void setSingleNumberChoice(boolean single) {
         mSingleNumber = single;
-    }
-
-    public void setNoAddPatternMenu(boolean no) {
-        mNoAddPatternMenu = no;
     }
 
     private void showNumberSelectionDialog(final String name,
@@ -247,13 +232,6 @@ public class PhoneNumberEditWidget extends LinearLayout {
         }
         cursor.close();
         this.showNumberSelectionDialog("", numbers, mSingleNumber);
-    }
-
-    public void onAddPatternMenuClicked() {
-        Intent patternSettingIntent = new Intent();
-        patternSettingIntent.setClassName("org.clc.android.app.redbox",
-                "org.clc.android.app.redbox.RedBoxPatternSettingActivity");
-        getContext().startActivity(patternSettingIntent);
     }
 
     public ArrayList<BlockSetting> getBlockSettings() {

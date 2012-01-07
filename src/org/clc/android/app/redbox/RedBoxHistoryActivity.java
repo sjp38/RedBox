@@ -20,6 +20,7 @@ import org.clc.android.app.redbox.data.ActionHistoryManager.OnHistoryChangeListe
 import org.clc.android.app.redbox.data.ActionRecord;
 import org.clc.android.app.redbox.data.BlockSetting;
 import org.clc.android.app.redbox.data.DataManager;
+import org.clc.android.app.redbox.data.GroupRule;
 import org.clc.android.app.redbox.data.PatternSetting;
 
 import java.sql.Timestamp;
@@ -57,6 +58,9 @@ public class RedBoxHistoryActivity extends ActionBarActivity implements
             if (setting instanceof PatternSetting) {
                 settingIntent.setClass(RedBoxHistoryActivity.this,
                         RedBoxPatternSettingActivity.class);
+            } else if (setting instanceof GroupRule) {
+                settingIntent
+                        .setClass(RedBoxHistoryActivity.this, RedBoxGroupSettingActivity.class);
             } else {
                 settingIntent.setClass(RedBoxHistoryActivity.this,
                         RedBoxBlockSettingActivity.class);
@@ -143,16 +147,21 @@ public class RedBoxHistoryActivity extends ActionBarActivity implements
             when.setText(format.format(timeStamp));
 
             String ruleName = rule.mAlias;
-            if (!(rule instanceof PatternSetting)) {
+            if (!(rule instanceof PatternSetting) && !(rule instanceof GroupRule)) {
                 if (ruleName == null || "".equals(ruleName)) {
                     ruleName = rule.mNumber;
                 }
             }
             if (ruleName == null || "".equals(ruleName)) {
-                ruleName = getResources().getString(R.string.pattern_unnamed);
+                final int nameResource;
+                if (rule instanceof PatternSetting) {
+                    nameResource = R.string.pattern_unnamed;
+                } else {
+                    nameResource = R.string.group_unnamed;
+                }
+                ruleName = getResources().getString(nameResource);
             }
-            matchedBy
-                    .setText(getString(R.string.record_matched_rule, ruleName));
+            matchedBy.setText(getString(R.string.record_matched_rule, ruleName));
 
             if (!rule.mRejectCall) {
                 rejectedCall.setVisibility(View.GONE);

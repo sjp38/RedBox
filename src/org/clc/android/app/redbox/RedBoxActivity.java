@@ -1,9 +1,10 @@
 
 package org.clc.android.app.redbox;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,6 +28,8 @@ import org.clc.android.app.redbox.ad.AdvertisementManager;
 import org.clc.android.app.redbox.data.BlockSetting;
 import org.clc.android.app.redbox.data.BlockSettingsManager.OnBlockSettingChangeListener;
 import org.clc.android.app.redbox.data.DataManager;
+import org.clc.android.app.redbox.data.GroupRule;
+import org.clc.android.app.redbox.data.GroupRulesManager.OnGroupRulesChangeListener;
 import org.clc.android.app.redbox.data.PatternSetting;
 import org.clc.android.app.redbox.data.PatternSettingsManager.OnPatternSettingChangeListener;
 import org.clc.android.app.redbox.util.string.RedBoxStringUtil;
@@ -35,8 +38,10 @@ import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
 import java.util.ArrayList;
 
 public class RedBoxActivity extends ActionBarActivity implements
-        OnBlockSettingChangeListener, OnPatternSettingChangeListener {
+        OnBlockSettingChangeListener, OnPatternSettingChangeListener, OnGroupRulesChangeListener {
     private static final String TAG = "RedBox";
+    private static final int MENU_ADD_PATTERN = 0;
+    private static final int MENU_ADD_GROUP = 1;
 
     public static final String ID = "id";
 
@@ -58,11 +63,11 @@ public class RedBoxActivity extends ActionBarActivity implements
 
             BlockSetting setting = DataManager.getInstance().get(id);
             if (setting instanceof PatternSetting) {
-                settingIntent.setClass(RedBoxActivity.this,
-                        RedBoxPatternSettingActivity.class);
+                settingIntent.setClass(RedBoxActivity.this, RedBoxPatternSettingActivity.class);
+            } else if (setting instanceof GroupRule) {
+                settingIntent.setClass(RedBoxActivity.this, RedBoxGroupSettingActivity.class);
             } else {
-                settingIntent.setClass(RedBoxActivity.this,
-                        RedBoxBlockSettingActivity.class);
+                settingIntent.setClass(RedBoxActivity.this, RedBoxBlockSettingActivity.class);
             }
             settingIntent.putExtra(ID, id);
 
@@ -124,6 +129,7 @@ public class RedBoxActivity extends ActionBarActivity implements
 
         DataManager.getInstance().setOnBlockSettingChangeListener(this);
         DataManager.getInstance().setOnPatternSettingChangeListener(this);
+        DataManager.getInstance().setOnGroupRulesChangeListener(this);
 
         mAdView = AdvertisementManager.getAdvertisementView(this);
         LinearLayout adLayout = (LinearLayout) findViewById(R.id.advertiseLayout);
@@ -164,8 +170,38 @@ public class RedBoxActivity extends ActionBarActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_action_add:
+                final CharSequence[] items;
+                items = getResources().getTextArray(R.array.menu_list_add);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final Intent intent = new Intent();
+                        switch (which) {
+                            case MENU_ADD_PATTERN:
+                                intent.setClass(RedBoxActivity.this,
+                                        RedBoxPatternSettingActivity.class);
+                                startActivity(intent);
+                                break;
+                            case MENU_ADD_GROUP:
+                                intent.setClass(RedBoxActivity.this,
+                                        RedBoxGroupSettingActivity.class);
+                                startActivity(intent);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+                builder.show();
+                break;
             case R.id.menu_action_log:
                 startActivity(new Intent(this, RedBoxHistoryActivity.class));
+                break;
+            default:
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -211,6 +247,11 @@ public class RedBoxActivity extends ActionBarActivity implements
 
     @Override
     public void onPatternSettingsChanged() {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onGroupRulesChanged() {
         mAdapter.notifyDataSetChanged();
     }
 
@@ -260,7 +301,14 @@ public class RedBoxActivity extends ActionBarActivity implements
                             + " " + position;
                 }
                 alias.setText(aliasString);
-                number.setText("");
+                number.setText(R.string.pattern);
+            } else if (setting instanceof GroupRule) {
+                String aliasString = setting.mAlias;
+                if (aliasString == null || "".equals(aliasString)) {
+                    aliasString = getResources().getString(R.string.group_unnamed) + " " + position;
+                }
+                alias.setText(aliasString);
+                number.setText(R.string.group);
             } else if (setting.mAlias.equals("")) {
                 alias.setText(setting.mNumber);
                 number.setText("");

@@ -1,6 +1,13 @@
 
 package org.clc.android.app.redbox.data;
 
+import android.util.Log;
+
+import org.clc.android.app.redbox.data.ActionHistoryManager.OnHistoryChangeListener;
+import org.clc.android.app.redbox.data.BlockSettingsManager.OnBlockSettingChangeListener;
+import org.clc.android.app.redbox.data.GroupRulesManager.OnGroupRulesChangeListener;
+import org.clc.android.app.redbox.data.PatternSettingsManager.OnPatternSettingChangeListener;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,12 +18,6 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.TreeMap;
-
-import org.clc.android.app.redbox.data.ActionHistoryManager.OnHistoryChangeListener;
-import org.clc.android.app.redbox.data.BlockSettingsManager.OnBlockSettingChangeListener;
-import org.clc.android.app.redbox.data.PatternSettingsManager.OnPatternSettingChangeListener;
-
-import android.util.Log;
 
 /**
  * Manage data control.
@@ -45,6 +46,7 @@ public class DataManager {
     private BlockSettingsManager mBlockManager = null;
     private PatternSettingsManager mPatternManager = null;
     private ActionHistoryManager mHistoryManager = null;
+    private GroupRulesManager mGroupsManager = null;
 
     private boolean mDataLoaded = false;
 
@@ -52,6 +54,7 @@ public class DataManager {
         mPatternManager = new PatternSettingsManager();
         mBlockManager = new BlockSettingsManager();
         mHistoryManager = new ActionHistoryManager();
+        mGroupsManager = new GroupRulesManager();
         loadDatas();
     }
 
@@ -72,28 +75,58 @@ public class DataManager {
             return;
         }
         File file = new File(DATA_FILE_PATH);
+        FileInputStream fis = null;
+        ObjectInput serialized = null;
+        TreeMap<Long, BlockSetting> blockSettings = null;
+        ArrayList<PatternSetting> patternSettings = null;
+        ArrayList<ActionRecord> actionRecords = null;
+        ArrayList<GroupRule> groupRules = null;
         try {
             Log.i(TAG, "load setting data.");
-            FileInputStream fis = new FileInputStream(file);
-            ObjectInput serialized = new ObjectInputStream(fis);
-            TreeMap<Long, BlockSetting> blockSettings = (TreeMap<Long, BlockSetting>) serialized
+            fis = new FileInputStream(file);
+            serialized = new ObjectInputStream(fis);
+            blockSettings = (TreeMap<Long, BlockSetting>) serialized
                     .readObject();
-            ArrayList<PatternSetting> patternSettings = (ArrayList<PatternSetting>) serialized
+            patternSettings = (ArrayList<PatternSetting>) serialized
                     .readObject();
-            ArrayList<ActionRecord> actionRecords = (ArrayList<ActionRecord>) serialized
+            actionRecords = (ArrayList<ActionRecord>) serialized
                     .readObject();
-            serialized.close();
-            fis.close();
-            mBlockManager.setDatas(blockSettings);
-            mPatternManager.setDatas(patternSettings);
-            mHistoryManager.setDatas(actionRecords);
+            groupRules = (ArrayList<GroupRule>) serialized.readObject();
 
-            mDataLoaded = true;
         } catch (IOException e) {
             Log.e(TAG, "IOException while read data file!", e);
             return;
         } catch (ClassNotFoundException e) {
             Log.e(TAG, "Class not found.", e);
+        } finally {
+            if (serialized != null) {
+                try {
+                    serialized.close();
+                } catch (IOException e) {
+
+                }
+            }
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+
+                }
+            }
+            if (blockSettings != null) {
+                mBlockManager.setDatas(blockSettings);
+            }
+            if (patternSettings != null) {
+                mPatternManager.setDatas(patternSettings);
+            }
+            if (actionRecords != null) {
+                mHistoryManager.setDatas(actionRecords);
+            }
+            if (groupRules != null) {
+                mGroupsManager.setDatas(groupRules);
+            }
+
+            mDataLoaded = true;
         }
         return;
     }
@@ -110,6 +143,7 @@ public class DataManager {
             serialized.writeObject(mBlockManager.getDatas());
             serialized.writeObject(mPatternManager.getDatas());
             serialized.writeObject(mHistoryManager.getDatas());
+            serialized.writeObject(mGroupsManager.getDatas());
             serialized.flush();
             serialized.close();
             fos.close();
@@ -153,7 +187,7 @@ public class DataManager {
     }
 
     public int getSize() {
-        return mPatternManager.getSize() + mBlockManager.getSize();
+        return mPatternManager.getSize() + mGroupsManager.getSize() + mBlockManager.getSize();
     }
 
     public int getHistorySize() {
@@ -165,7 +199,7 @@ public class DataManager {
     }
 
     /**
-     * For block / pattern.
+     * For block / pattern / group.
      * 
      * @param id
      * @return
@@ -173,8 +207,10 @@ public class DataManager {
     public BlockSetting get(int id) {
         if (id < mPatternManager.getSize()) {
             return mPatternManager.get(id);
+        } else if (id < mPatternManager.getSize() + mGroupsManager.getSize()) {
+            return mGroupsManager.get(id - mPatternManager.getSize());
         }
-        return mBlockManager.get(id - mPatternManager.getSize());
+        return mBlockManager.get(id - mPatternManager.getSize() - mGroupsManager.getSize());
     }
 
     public ActionRecord getHistory(int id) {
@@ -182,29 +218,36 @@ public class DataManager {
     }
 
     /**
-     * For block only.
+     * For block / group.
      * 
      * @param parsedNumber
      * @return
      */
     public BlockSetting getBlockSetting(String parsedNumber) {
-        return mBlockManager.get(parsedNumber);
+        BlockSetting setting = mBlockManager.get(parsedNumber);
+        if (setting != null) {
+            return mBlockManager.get(parsedNumber);
+        } else {
+            return mGroupsManager.get(parsedNumber);
+        }
     }
 
     /**
-     * For block only.
+     * For block / group.
      * 
      * @param setting
      * @return
      */
     public boolean isExist(BlockSetting setting) {
-        return mBlockManager.isExist(setting);
+        return mBlockManager.isExist(setting) || mGroupsManager.isExist(setting.mParsedNumber);
     }
 
     public void add(BlockSetting setting) {
         Log.d(TAG, "add " + setting.toString());
         if (setting instanceof PatternSetting) {
             mPatternManager.add((PatternSetting) setting);
+        } else if (setting instanceof GroupRule) {
+            mGroupsManager.addGroup((GroupRule) setting);
         } else {
             mBlockManager.add(setting);
         }
@@ -219,20 +262,34 @@ public class DataManager {
         if (id < mPatternManager.getSize()) {
             mPatternManager.remove(id);
             return;
+        } else if (id < mPatternManager.getSize() + mGroupsManager.getSize()) {
+            mGroupsManager.removeGroup(id - mPatternManager.getSize());
+            return;
         }
-        mBlockManager.remove(id - mPatternManager.getSize());
+        mBlockManager.remove(id - mPatternManager.getSize() - mGroupsManager.getSize());
     }
 
     public void remove(final BlockSetting setting) {
         if (setting instanceof PatternSetting) {
             mPatternManager.remove((PatternSetting) setting);
+        } else if (setting instanceof GroupRule) {
+            mGroupsManager.remove((GroupRule) setting);
         } else {
             mBlockManager.remove(setting);
         }
     }
 
+    public void remove(String parsedNumber) {
+        BlockSetting setting = mBlockManager.get(parsedNumber);
+        if (setting != null) {
+            mBlockManager.remove(setting);
+            return;
+        }
+        mGroupsManager.removeMember(parsedNumber);
+    }
+
     public boolean isExist(final String parsedNumber) {
-        return mBlockManager.isExist(parsedNumber);
+        return mBlockManager.isExist(parsedNumber) || mGroupsManager.isExist(parsedNumber);
     }
 
     public void update(final int id, final BlockSetting setting) {
@@ -243,24 +300,39 @@ public class DataManager {
                 Log.e(TAG, "Block setting update with pattern setting id!");
             }
             return;
+        } else if (id < mPatternManager.getSize() + mGroupsManager.getSize()) {
+            if (setting instanceof GroupRule) {
+                mGroupsManager.update(id - mPatternManager.getSize(), (GroupRule) setting);
+            } else {
+                Log.e(TAG, "Non group rule update with group rule id!");
+            }
+            return;
         }
-        mBlockManager.update(id - mPatternManager.getSize(), setting);
+        mBlockManager.update(id - mGroupsManager.getSize() - mPatternManager.getSize(), setting);
     }
 
     public void updateRejectCall(final int id, boolean reject) {
         if (id < mPatternManager.getSize()) {
             mPatternManager.updateRejectCall(id, reject);
             return;
+        } else if (id < mPatternManager.getSize() + mGroupsManager.getSize()) {
+            mGroupsManager.updateRejectCall(id - mPatternManager.getSize(), reject);
+            return;
         }
-        mBlockManager.updateRejectCall(id - mPatternManager.getSize(), reject);
+        mBlockManager.updateRejectCall(id - mPatternManager.getSize() - mGroupsManager.getSize(),
+                reject);
     }
 
     public void updateDeleteCallLog(final int id, boolean deleteCallLog) {
         if (id < mPatternManager.getSize()) {
             mPatternManager.updateDeleteCallLog(id, deleteCallLog);
             return;
+        } else if (id < mPatternManager.getSize() + mGroupsManager.getSize()) {
+            mGroupsManager.updateDeleteCallLog(id - mPatternManager.getSize(), deleteCallLog);
+            return;
         }
-        mBlockManager.updateDeleteCallLog(id - mPatternManager.getSize(),
+        mBlockManager.updateDeleteCallLog(
+                id - mPatternManager.getSize() - mGroupsManager.getSize(),
                 deleteCallLog);
     }
 
@@ -268,8 +340,12 @@ public class DataManager {
         if (id < mPatternManager.getSize()) {
             mPatternManager.updateSendAutoSMS(id, send);
             return;
+        } else if (id < mPatternManager.getSize() + mGroupsManager.getSize()) {
+            mGroupsManager.updateSendAutoSMS(id - mPatternManager.getSize(), send);
+            return;
         }
-        mBlockManager.updateSendAutoSMS(id - mPatternManager.getSize(), send);
+        mBlockManager.updateSendAutoSMS(id - mPatternManager.getSize() - mGroupsManager.getSize(),
+                send);
     }
 
     public void setOnBlockSettingChangeListener(
@@ -286,12 +362,19 @@ public class DataManager {
         mHistoryManager.setOnHistoryChangeListener(listener);
     }
 
+    public void setOnGroupRulesChangeListener(OnGroupRulesChangeListener listener) {
+        mGroupsManager.setOnGroupRulesChangeListener(listener);
+    }
+
     public int getId(final BlockSetting rule) {
         if (rule instanceof PatternSetting) {
             int id = mPatternManager.getId((PatternSetting) rule);
-            return id == -1 ? -1 : id;
+            return id;
+        } else if (rule instanceof GroupRule) {
+            int id = mGroupsManager.getPosition((GroupRule) rule);
+            return id == -1 ? -1 : id + mPatternManager.getSize();
         }
         int id = mBlockManager.getId(rule);
-        return id == -1 ? -1 : id + mPatternManager.getSize();
+        return id == -1 ? -1 : id + mPatternManager.getSize() + mGroupsManager.getSize();
     }
 }

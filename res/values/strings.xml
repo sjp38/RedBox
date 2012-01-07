@@ -4,15 +4,17 @@
     <string name="block_rule_setting_activity">Reaction setting</string>
     <string name="pattern_setting_activity_label">Pattern setting</string>
     <string name="history_activity_label">Recent history</string>
+    <string name="group_setting_activity_label">Group setting</string>
 
     <string name="menu_action_log">Action log</string>
+    <string name="menu_action_add">Add</string>
+
+    <string-array name="menu_list_add">
+        <item>Add pattern</item>
+        <item>Add group</item>
+    </string-array>
 
     <string-array name="menu_list_phonenumber_edit_widget">
-        <item>Get number from contact</item>
-        <item>Get number from call log</item>
-        <item>Add Pattern</item>
-    </string-array>
-    <string-array name="menu_list_without_add_pattern_phonenumber_edit_widget">
         <item>Get number from contact</item>
         <item>Get number from call log</item>
     </string-array>
@@ -23,6 +25,7 @@
     <string name="error_while_pick_contact">Error while pick contact.</string>
     <string name="error_blank_number">Blank number can\'t be added.</string>
     <string name="error_wrong_number">Wrong number. Number can has digit, -, +, (, ) only.</string>
+    <string name="error_duplicate_number_will_overwrite">Same number already exist in rule. Delete already existing rule and add this number here?</string>
 
     <string name="title_select_number">Select numbers to add.</string>
     <string name="error_blank_contact">Selected contact has no phone number.</string>
@@ -47,6 +50,7 @@
     </string>
 
     <string name="pattern_unnamed">unnamed pattern</string>
+    <string name="pattern">Pattern</string>
 
     <string name="pattern_setting_alias_description">Pattern\'s alias. Touch to edit.</string>
     <string name="pattern_setting_alias_hint">Pattern\'s alias. Touch to edit.</string>
@@ -63,6 +67,14 @@
     <string name="save_changes_before_closing">Save changes before closing?</string>
     <string name="save_and_quit">Save and quit</string>
     <string name="quit_without_saving">Quit without saving</string>
+
+    <string name="group_unnamed">unnamed group</string>
+    <string name="group">Group</string>
+
+    <string name="group_setting_alias_hint">Group\'s alias. Touch to edit.</string>
+    <string name="group_setting_alias_description">Group\'s alias. Touch to edit.</string>
+    <string name="group_setting_alias_dialog_title">Insert alias for this group.</string>
+    <string name="group_setting_members">Members</string>
 
     <string name="dialog_positive_button">OK</string>
     <string name="dialog_negative_button">Cancel</string>

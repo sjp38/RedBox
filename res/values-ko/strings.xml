@@ -4,15 +4,17 @@
     <string name="block_rule_setting_activity">동작 설정</string>
     <string name="pattern_setting_activity_label">패턴 설정</string>
     <string name="history_activity_label">최근 기록</string>
+    <string name="group_setting_activity_label">그룹 설정</string>
 
     <string name="menu_action_log">동작 기록</string>
+    <string name="menu_action_add">규칙 추가</string>
+
+    <string-array name="menu_list_add">
+        <item>번호 패턴 추가</item>
+        <item>번호 그룹 추가</item>
+    </string-array>
 
     <string-array name="menu_list_phonenumber_edit_widget">
-        <item>연락처에서 번호 추가</item>
-        <item>통화기록에서 번호 추가</item>
-        <item>번호 패턴 추가</item>
-    </string-array>
-    <string-array name="menu_list_without_add_pattern_phonenumber_edit_widget">
         <item>연락처에서 번호 추가</item>
         <item>통화기록에서 번호 추가</item>
     </string-array>
@@ -23,6 +25,7 @@
     <string name="error_while_pick_contact">Contact 정보를 가져오는 중 문제가 발생했습니다.</string>
     <string name="error_blank_number">빈 번호는 입력될 수 없습니다.</string>
     <string name="error_wrong_number">잘못된 형식의 번호입니다. 번호는 숫자, -, +, (, ) 만으로 구성되어야 합니다.</string>
+    <string name="error_duplicate_number_will_overwrite">같은 번호가 다른 규칙에 존재합니다. 이미 존재하는 규칙을 지우고 여기에 번호를 추가합니다.</string>
 
     <string name="title_select_number">추가할 번호를 선택하세요.</string>
     <string name="error_blank_contact">선택하신 연락처에는 전화 번호가 존재하지 않습니다.</string>
@@ -43,9 +46,11 @@
     <string name="setting_number_dialog_title">관리하실 번호 패턴을 입력하세요.</string>
 
     <string name="pattern_unnamed">이름 없는 패턴</string>
+    <string name="pattern">패턴</string>
 
     <string name="pattern_setting_alias_description">패턴의 이름. 수정하려면 터치하세요.</string>
     <string name="pattern_setting_alias_hint">패턴 이름. 수정하려면 터치하세요.</string>
+    <string name="pattern_setting_alias_dialog_title">패턴의 이름을 입력하세요.</string>
     <string name="pattern_setting_startWith">시작 번호</string>
     <string name="pattern_setting_startWith_description">이 번호로 시작하는 모든 번호.</string>
     <string name="pattern_setting_endWith">종료 번호</string>
@@ -58,6 +63,14 @@
     <string name="save_changes_before_closing">변경 사항을 저장하고 종료하시겠습니까?</string>
     <string name="save_and_quit">저장하고 종료</string>
     <string name="quit_without_saving">저장하지 않고 종료</string>
+
+    <string name="group_unnamed">이름 없는 그룹</string>
+    <string name="group">그룹</string>
+
+    <string name="group_setting_alias_hint">그룹의 이름. 수정하려면 터치하세요.</string>
+    <string name="group_setting_alias_description">그룹의 이름. 수정하려면 터치하세요.</string>
+    <string name="group_setting_alias_dialog_title">그룹의 이름을 입력하세요.</string>
+    <string name="group_setting_members">멤버</string>
 
     <string name="dialog_positive_button">확인</string>
     <string name="dialog_negative_button">취소</string>

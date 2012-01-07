@@ -1,14 +1,6 @@
 
 package org.clc.android.app.redbox;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-
-import org.clc.android.app.redbox.data.ActionRecord;
-import org.clc.android.app.redbox.data.BlockSetting;
-import org.clc.android.app.redbox.data.DataManager;
-import org.clc.android.app.redbox.data.PatternSetting;
-
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +18,15 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.android.internal.telephony.ITelephony;
+
+import org.clc.android.app.redbox.data.ActionRecord;
+import org.clc.android.app.redbox.data.BlockSetting;
+import org.clc.android.app.redbox.data.DataManager;
+import org.clc.android.app.redbox.data.GroupRule;
+import org.clc.android.app.redbox.data.PatternSetting;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 public class RedBoxService extends Service {
     private static final String TAG = "RedBox_service";
@@ -107,7 +108,7 @@ public class RedBoxService extends Service {
         }
         try {
             BlockSetting copiedSetting = (BlockSetting) setting.clone();
-            if (setting instanceof PatternSetting) {
+            if (setting instanceof PatternSetting || setting instanceof GroupRule) {
                 copiedSetting.mNumber = incomingNumber;
             }
             ActionRecord record = new ActionRecord(System.currentTimeMillis(),
