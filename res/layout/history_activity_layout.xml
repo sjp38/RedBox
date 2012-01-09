@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background_holo_dark"
     android:orientation="vertical" >
 
     <RelativeLayout
@@ -22,6 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@id/advertiseLayout"
+            android:cacheColorHint="#00000000"
             android:scrollbarStyle="outsideOverlay" />
     </RelativeLayout>
 
