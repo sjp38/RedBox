@@ -203,7 +203,6 @@ public class PhoneNumberEditWidget extends LinearLayout {
                 showNumberSelectionDialog(name, phoneNumbers, mSingleNumber);
             }
         }
-        cursor.close();
         if (!numberExist) {
             Toast.makeText(getContext(), R.string.error_blank_contact,
                     Toast.LENGTH_SHORT).show();
