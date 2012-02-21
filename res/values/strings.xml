@@ -94,4 +94,7 @@
     <string name="suggestion_add_dialog_title">Add suggestion</string>
     <string name="suggestion_edit_dialog_title">Edit suggestion</string>
     <string name="warning_suggestion_should_not_empty">Suggestion should not be empty.</string>
+
+    <string name="manual_dialog_message">Will show how to use this app.</string>
+    <string name="manual_url">https://docs.google.com/presentation/d/1l6RAZhD2lS_2rukdi7SMdRbuvoosOwoNhFBw2zDGRZI/edit</string>
 </resources>

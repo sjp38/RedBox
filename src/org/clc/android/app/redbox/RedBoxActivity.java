@@ -5,7 +5,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,6 +45,7 @@ public class RedBoxActivity extends ActionBarActivity implements
     private static final String TAG = "RedBox";
     private static final int MENU_ADD_PATTERN = 0;
     private static final int MENU_ADD_GROUP = 1;
+    private static final String PREFS_MANUAL_DIALOG_SHOWED = "org.clc.android.app.redbox.PREFS_MANUAL_DIALOG_SHOWED";
 
     public static final String ID = "id";
 
@@ -134,6 +138,8 @@ public class RedBoxActivity extends ActionBarActivity implements
         mAdView = AdvertisementManager.getAdvertisementView(this);
         LinearLayout adLayout = (LinearLayout) findViewById(R.id.advertiseLayout);
         adLayout.addView(mAdView);
+
+        showsManualIfNeed();
     }
 
     public void onDestroy() {
@@ -253,6 +259,41 @@ public class RedBoxActivity extends ActionBarActivity implements
     @Override
     public void onGroupRulesChanged() {
         mAdapter.notifyDataSetChanged();
+    }
+
+    private void showManual() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.manual_dialog_message);
+        builder.setPositiveButton(R.string.dialog_positive_button,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final SharedPreferences prefs = PreferenceManager
+                                .getDefaultSharedPreferences(RedBoxActivity.this);
+                        final SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean(PREFS_MANUAL_DIALOG_SHOWED, true);
+                        editor.commit();
+
+                        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri
+                                .parse(RedBoxActivity.this.getString(R.string.manual_url)));
+                        startActivity(intent);
+                    }
+                });
+        builder.setNegativeButton(R.string.dialog_negative_button,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        builder.show();
+    }
+
+    private void showsManualIfNeed() {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (!prefs.getBoolean(PREFS_MANUAL_DIALOG_SHOWED, false)) {
+            showManual();
+        }
     }
 
     private class NumbersListAdapter extends BaseAdapter {
