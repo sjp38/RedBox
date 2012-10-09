@@ -93,4 +93,7 @@
 
     <string name="manual_dialog_message">이 앱의 사용법을 알아봅니다.</string>
     <string name="manual_url">https://docs.google.com/presentation/d/1q_rTGlbZor9rPlaLknjVo6XCW5_-0KvG6-A4Y0A8D_k/edit</string>
+
+    <string name="history_deleted">해당 기록을 삭제 했습니다.</string>
+    <string name="noti_actived">\'지금은 바빠요\'가 동작 중입니다.</string>
 </resources>

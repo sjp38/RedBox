@@ -1,7 +1,9 @@
-
 package org.clc.android.app.redbox;
 
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,350 +43,388 @@ import org.clc.android.app.redbox.widget.PhoneNumberEditWidget;
 import java.util.ArrayList;
 
 public class RedBoxActivity extends ActionBarActivity implements
-        OnBlockSettingChangeListener, OnPatternSettingChangeListener, OnGroupRulesChangeListener {
-    private static final String TAG = "RedBox";
-    private static final int MENU_ADD_PATTERN = 0;
-    private static final int MENU_ADD_GROUP = 1;
-    private static final String PREFS_MANUAL_DIALOG_SHOWED = "org.clc.android.app.redbox.PREFS_MANUAL_DIALOG_SHOWED";
+		OnBlockSettingChangeListener, OnPatternSettingChangeListener,
+		OnGroupRulesChangeListener {
+	private static final String TAG = "RedBox";
+	private static final int MENU_ADD_PATTERN = 0;
+	private static final int MENU_ADD_GROUP = 1;
+	private static final String PREFS_MANUAL_DIALOG_SHOWED = "org.clc.android.app.redbox.PREFS_MANUAL_DIALOG_SHOWED";
 
-    public static final String ID = "id";
+	public static final String ID = "id";
 
-    private ListView mNumbersListView = null;
-    private NumbersListAdapter mAdapter = null;
-    private LayoutInflater mLayoutInflater = null;
-    private PhoneNumberEditWidget mPhoneNumberEditor = null;
+	private ListView mNumbersListView = null;
+	private NumbersListAdapter mAdapter = null;
+	private LayoutInflater mLayoutInflater = null;
+	private PhoneNumberEditWidget mPhoneNumberEditor = null;
 
-    // for advertise.
-    private View mAdView;
+	// for advertise.
+	private View mAdView;
 
-    private OnClickListener mNumberClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            final View parent = (View) v.getParent();
-            final int id = (Integer) parent.getTag();
+	private OnClickListener mNumberClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			final View parent = (View) v.getParent();
+			final int id = (Integer) parent.getTag();
 
-            Intent settingIntent = new Intent();
+			Intent settingIntent = new Intent();
 
-            BlockSetting setting = DataManager.getInstance().get(id);
-            if (setting instanceof PatternSetting) {
-                settingIntent.setClass(RedBoxActivity.this, RedBoxPatternSettingActivity.class);
-            } else if (setting instanceof GroupRule) {
-                settingIntent.setClass(RedBoxActivity.this, RedBoxGroupSettingActivity.class);
-            } else {
-                settingIntent.setClass(RedBoxActivity.this, RedBoxBlockSettingActivity.class);
-            }
-            settingIntent.putExtra(ID, id);
+			BlockSetting setting = DataManager.getInstance().get(id);
+			if (setting instanceof PatternSetting) {
+				settingIntent.setClass(RedBoxActivity.this,
+						RedBoxPatternSettingActivity.class);
+			} else if (setting instanceof GroupRule) {
+				settingIntent.setClass(RedBoxActivity.this,
+						RedBoxGroupSettingActivity.class);
+			} else {
+				settingIntent.setClass(RedBoxActivity.this,
+						RedBoxBlockSettingActivity.class);
+			}
+			settingIntent.putExtra(ID, id);
 
-            RedBoxActivity.this.startActivity(settingIntent);
+			RedBoxActivity.this.startActivity(settingIntent);
 
-        }
-    };
+		}
+	};
 
-    private OnCheckedChangeListener mRejectCallCheckChangeListener = new OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(CompoundButton view, boolean isChecked) {
-            final View parent = (View) view.getParent();
-            final int id = (Integer) parent.getTag();
-            DataManager.getInstance().updateRejectCall(id, isChecked);
-        }
-    };
+	private OnCheckedChangeListener mRejectCallCheckChangeListener = new OnCheckedChangeListener() {
+		@Override
+		public void onCheckedChanged(CompoundButton view, boolean isChecked) {
+			final View parent = (View) view.getParent();
+			final int id = (Integer) parent.getTag();
+			DataManager.getInstance().updateRejectCall(id, isChecked);
+		}
+	};
 
-    private OnCheckedChangeListener mRemoveCallLogCheckChangeListener = new OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(CompoundButton view, boolean isChecked) {
-            final View parent = (View) view.getParent();
-            final int id = (Integer) parent.getTag();
-            DataManager.getInstance().updateDeleteCallLog(id, isChecked);
-        }
-    };
+	private OnCheckedChangeListener mRemoveCallLogCheckChangeListener = new OnCheckedChangeListener() {
+		@Override
+		public void onCheckedChanged(CompoundButton view, boolean isChecked) {
+			final View parent = (View) view.getParent();
+			final int id = (Integer) parent.getTag();
+			DataManager.getInstance().updateDeleteCallLog(id, isChecked);
+		}
+	};
 
-    private OnCheckedChangeListener mSendAutoSMSCheckChangeListener = new OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(CompoundButton view, boolean isChecked) {
-            final View parent = (View) view.getParent();
-            final int id = (Integer) parent.getTag();
-            BlockSetting setting = DataManager.getInstance().get(id);
-            DataManager.getInstance().updateSendAutoSMS(id, isChecked);
-        }
-    };
+	private OnCheckedChangeListener mSendAutoSMSCheckChangeListener = new OnCheckedChangeListener() {
+		@Override
+		public void onCheckedChanged(CompoundButton view, boolean isChecked) {
+			final View parent = (View) view.getParent();
+			final int id = (Integer) parent.getTag();
+			BlockSetting setting = DataManager.getInstance().get(id);
+			DataManager.getInstance().updateSendAutoSMS(id, isChecked);
+		}
+	};
 
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.phone_number_insert_list);
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.phone_number_insert_list);
 
-        mNumbersListView = (ListView) findViewById(R.id.numbersList);
+		mNumbersListView = (ListView) findViewById(R.id.numbersList);
 
-        mAdapter = new NumbersListAdapter();
-        mNumbersListView.setAdapter(mAdapter);
+		mAdapter = new NumbersListAdapter();
+		mNumbersListView.setAdapter(mAdapter);
 
-        mPhoneNumberEditor = (PhoneNumberEditWidget) findViewById(R.id.number_input_textView);
-        mPhoneNumberEditor
-                .setOnNumberSelectedListener(new PhoneNumberEditWidget.OnNumberSelectedListener() {
-                    @Override
-                    public void onNumberSelected() {
-                        onAddNumberClicked(null);
-                    }
-                });
+		mPhoneNumberEditor = (PhoneNumberEditWidget) findViewById(R.id.number_input_textView);
+		mPhoneNumberEditor
+				.setOnNumberSelectedListener(new PhoneNumberEditWidget.OnNumberSelectedListener() {
+					@Override
+					public void onNumberSelected() {
+						onAddNumberClicked(null);
+					}
+				});
 
-        Context context = getApplicationContext();
-        context.startService(new Intent(context, RedBoxService.class));
+		Context context = getApplicationContext();
+		context.startService(new Intent(context, RedBoxService.class));
 
-        DataManager.getInstance().setOnBlockSettingChangeListener(this);
-        DataManager.getInstance().setOnPatternSettingChangeListener(this);
-        DataManager.getInstance().setOnGroupRulesChangeListener(this);
+		DataManager.getInstance().setOnBlockSettingChangeListener(this);
+		DataManager.getInstance().setOnPatternSettingChangeListener(this);
+		DataManager.getInstance().setOnGroupRulesChangeListener(this);
 
-        mAdView = AdvertisementManager.getAdvertisementView(this);
-        LinearLayout adLayout = (LinearLayout) findViewById(R.id.advertiseLayout);
-        adLayout.addView(mAdView);
+		mAdView = AdvertisementManager.getAdvertisementView(this);
+		LinearLayout adLayout = (LinearLayout) findViewById(R.id.advertiseLayout);
+		adLayout.addView(mAdView);
 
-        showsManualIfNeed();
-    }
+		showsManualIfNeed();
+	}
 
-    public void onDestroy() {
-        AdvertisementManager.destroyAd(mAdView);
-        super.onDestroy();
-    }
+	public void onDestroy() {
+		AdvertisementManager.destroyAd(mAdView);
+		super.onDestroy();
+	}
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        DataManager.getInstance().saveSettings();
-    }
+	@Override
+	public void onPause() {
+		super.onPause();
+		DataManager.getInstance().saveSettings();
+	}
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case PhoneNumberEditWidget.PICK_CONTACT_REQUEST:
-                mPhoneNumberEditor.onContactActivityResult(resultCode, data);
-                break;
-            default:
-                break;
-        }
-    }
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		switch (requestCode) {
+		case PhoneNumberEditWidget.PICK_CONTACT_REQUEST:
+			mPhoneNumberEditor.onContactActivityResult(resultCode, data);
+			break;
+		default:
+			break;
+		}
+	}
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.redbox_activity_menu, menu);
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater menuInflater = getMenuInflater();
+		menuInflater.inflate(R.menu.redbox_activity_menu, menu);
 
-        return super.onCreateOptionsMenu(menu);
-    }
+		return super.onCreateOptionsMenu(menu);
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_action_add:
-                final CharSequence[] items;
-                items = getResources().getTextArray(R.array.menu_list_add);
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_action_add:
+			final CharSequence[] items;
+			items = getResources().getTextArray(R.array.menu_list_add);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        final Intent intent = new Intent();
-                        switch (which) {
-                            case MENU_ADD_PATTERN:
-                                intent.setClass(RedBoxActivity.this,
-                                        RedBoxPatternSettingActivity.class);
-                                startActivity(intent);
-                                break;
-                            case MENU_ADD_GROUP:
-                                intent.setClass(RedBoxActivity.this,
-                                        RedBoxGroupSettingActivity.class);
-                                startActivity(intent);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                });
-                builder.show();
-                break;
-            case R.id.menu_action_log:
-                startActivity(new Intent(this, RedBoxHistoryActivity.class));
-                break;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setItems(items, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					final Intent intent = new Intent();
+					switch (which) {
+					case MENU_ADD_PATTERN:
+						intent.setClass(RedBoxActivity.this,
+								RedBoxPatternSettingActivity.class);
+						startActivity(intent);
+						break;
+					case MENU_ADD_GROUP:
+						intent.setClass(RedBoxActivity.this,
+								RedBoxGroupSettingActivity.class);
+						startActivity(intent);
+						break;
+					default:
+						break;
+					}
+				}
+			});
+			builder.show();
+			break;
+		case R.id.menu_action_log:
+			startActivity(new Intent(this, RedBoxHistoryActivity.class));
+			break;
+		default:
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
-    private void addNumber(String alias, String number, boolean notify) {
-        if ("".equals(number)) {
-            if (notify) {
-                Toast.makeText(this, R.string.error_blank_number,
-                        Toast.LENGTH_SHORT).show();
-            }
-            return;
-        }
-        final String parsedNumber = DataManager.getParsedNumber(number);
-        if (DataManager.getInstance().isExist(parsedNumber)) {
-            if (notify) {
-                Toast.makeText(this, R.string.error_duplicate_number,
-                        Toast.LENGTH_SHORT).show();
-            }
-            return;
-        }
-        BlockSetting setting = new BlockSetting(alias, number);
-        DataManager.getInstance().add(setting);
-        mAdapter.notifyDataSetChanged();
-    }
+	private void addNumber(String alias, String number, boolean notify) {
+		if ("".equals(number)) {
+			if (notify) {
+				Toast.makeText(this, R.string.error_blank_number,
+						Toast.LENGTH_SHORT).show();
+			}
+			return;
+		}
+		final String parsedNumber = DataManager.getParsedNumber(number);
+		if (DataManager.getInstance().isExist(parsedNumber)) {
+			if (notify) {
+				Toast.makeText(this, R.string.error_duplicate_number,
+						Toast.LENGTH_SHORT).show();
+			}
+			return;
+		}
+		BlockSetting setting = new BlockSetting(alias, number);
+		DataManager.getInstance().add(setting);
+		mAdapter.notifyDataSetChanged();
+	}
 
-    public void onAddNumberClicked(View v) {
-        final ArrayList<BlockSetting> settings = mPhoneNumberEditor
-                .getBlockSettings();
-        for (BlockSetting setting : settings) {
-            if (!DataManager.isValid(setting.mNumber)) {
-                Toast.makeText(this, R.string.error_wrong_number,
-                        Toast.LENGTH_SHORT).show();
-            }
-            addNumber(setting.mAlias, setting.mNumber, true);
-        }
-        mPhoneNumberEditor.setText("");
-    }
+	public void onAddNumberClicked(View v) {
+		final ArrayList<BlockSetting> settings = mPhoneNumberEditor
+				.getBlockSettings();
+		for (BlockSetting setting : settings) {
+			if (!DataManager.isValid(setting.mNumber)) {
+				Toast.makeText(this, R.string.error_wrong_number,
+						Toast.LENGTH_SHORT).show();
+			}
+			addNumber(setting.mAlias, setting.mNumber, true);
+		}
+		mPhoneNumberEditor.setText("");
+	}
 
-    @Override
-    public void onBlockSettingsChanged() {
-        mAdapter.notifyDataSetChanged();
-    }
+	@Override
+	public void onBlockSettingsChanged() {
+		mAdapter.notifyDataSetChanged();
+		showNotificationIfActive();
+		android.util.Log.d("sj38.park_test", "bbb");
+	}
 
-    @Override
-    public void onPatternSettingsChanged() {
-        mAdapter.notifyDataSetChanged();
-    }
+	@Override
+	public void onPatternSettingsChanged() {
+		mAdapter.notifyDataSetChanged();
+		showNotificationIfActive();
+		android.util.Log.d("sj38.park_test", "ccc");
+	}
 
-    @Override
-    public void onGroupRulesChanged() {
-        mAdapter.notifyDataSetChanged();
-    }
+	@Override
+	public void onGroupRulesChanged() {
+		mAdapter.notifyDataSetChanged();
+		showNotificationIfActive();
+		android.util.Log.d("sj38.park_test", "aaa");
+	}
 
-    private void showManual() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.manual_dialog_message);
-        builder.setPositiveButton(R.string.dialog_positive_button,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        final SharedPreferences prefs = PreferenceManager
-                                .getDefaultSharedPreferences(RedBoxActivity.this);
-                        final SharedPreferences.Editor editor = prefs.edit();
-                        editor.putBoolean(PREFS_MANUAL_DIALOG_SHOWED, true);
-                        editor.commit();
+	private void showNotificationIfActive() {
+		final boolean isActive = DataManager.getInstance().existActiveRule();
 
-                        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri
-                                .parse(RedBoxActivity.this.getString(R.string.manual_url)));
-                        startActivity(intent);
-                    }
-                });
-        builder.setNegativeButton(R.string.dialog_negative_button,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-        builder.show();
-    }
+		NotificationManager mNotiManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-    private void showsManualIfNeed() {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (!prefs.getBoolean(PREFS_MANUAL_DIALOG_SHOWED, false)) {
-            showManual();
-        }
-    }
+		if (!isActive) {
+			mNotiManager.cancelAll();
+			return;
+		}
 
-    private class NumbersListAdapter extends BaseAdapter {
-        NumbersListAdapter() {
-            super();
-            mLayoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        }
+		Intent intent = new Intent(this, RedBoxActivity.class);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+				intent, 0);
 
-        @Override
-        public int getCount() {
-            return DataManager.getInstance().getSize();
-        }
+		Notification noti = new Notification(R.drawable.ic_action_home_redbox,
+				getText(R.string.noti_actived), System.currentTimeMillis());
+		noti.setLatestEventInfo(getApplicationContext(),
+				getText(R.string.app_name), getText(R.string.noti_actived),
+				pendingIntent);
+		noti.flags |= Notification.FLAG_NO_CLEAR;
+		mNotiManager.notify(5, noti);
+	}
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View numberList;
-            if (convertView == null) {
-                numberList = mLayoutInflater.inflate(R.layout.number_list,
-                        parent, false);
-                View trashButton = numberList.findViewById(R.id.delete_button);
-                trashButton.setVisibility(View.GONE);
-            } else {
-                numberList = convertView;
-            }
-            numberList.setTag((Integer) position);
-            TextView alias = (TextView) numberList
-                    .findViewById(R.id.alias_textview);
-            TextView number = (TextView) numberList
-                    .findViewById(R.id.number_textview);
-            CheckBox rejectCallCheckBox = (CheckBox) numberList
-                    .findViewById(R.id.reject_call_checkBox);
-            CheckBox removeCallLogCheckBox = (CheckBox) numberList
-                    .findViewById(R.id.remove_call_log_checkBox);
-            CheckBox sendAutoSMSCheckBox = (CheckBox) numberList
-                    .findViewById(R.id.send_auto_sms_checkBox);
+	private void showManual() {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(R.string.manual_dialog_message);
+		builder.setPositiveButton(R.string.dialog_positive_button,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						final SharedPreferences prefs = PreferenceManager
+								.getDefaultSharedPreferences(RedBoxActivity.this);
+						final SharedPreferences.Editor editor = prefs.edit();
+						editor.putBoolean(PREFS_MANUAL_DIALOG_SHOWED, true);
+						editor.commit();
 
-            View aliasNumberLayout = numberList
-                    .findViewById(R.id.aliasNumberLayout);
-            aliasNumberLayout.setOnClickListener(mNumberClickListener);
+						final Intent intent = new Intent(Intent.ACTION_VIEW,
+								Uri.parse(RedBoxActivity.this
+										.getString(R.string.manual_url)));
+						startActivity(intent);
+					}
+				});
+		builder.setNegativeButton(R.string.dialog_negative_button,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+					}
+				});
+		builder.show();
+	}
 
-            BlockSetting setting = DataManager.getInstance().get(position);
-            if (setting instanceof PatternSetting) {
-                String aliasString = setting.mAlias;
-                if (RedBoxStringUtil.isNullOrEmpty(aliasString)) {
-                    aliasString = getResources().getString(R.string.pattern_unnamed)
-                            + " " + position;
-                }
-                alias.setText(aliasString);
-                number.setText(R.string.pattern);
-            } else if (setting instanceof GroupRule) {
-                String aliasString = setting.mAlias;
-                if (aliasString == null || "".equals(aliasString)) {
-                    aliasString = getResources().getString(R.string.group_unnamed) + " " + position;
-                }
-                alias.setText(aliasString);
-                number.setText(R.string.group);
-            } else if (setting.mAlias.equals("")) {
-                alias.setText(setting.mNumber);
-                number.setText("");
-            } else {
-                alias.setText(setting.mAlias);
-                number.setText(setting.mNumber);
-            }
-            rejectCallCheckBox.setChecked(setting.mRejectCall);
-            removeCallLogCheckBox.setChecked(setting.mDeleteCallLog);
-            sendAutoSMSCheckBox.setChecked(setting.mSendAutoSMS);
+	private void showsManualIfNeed() {
+		final SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		if (!prefs.getBoolean(PREFS_MANUAL_DIALOG_SHOWED, false)) {
+			showManual();
+		}
+	}
 
-            if (convertView == null) {
-                rejectCallCheckBox
-                        .setOnCheckedChangeListener(mRejectCallCheckChangeListener);
-                removeCallLogCheckBox
-                        .setOnCheckedChangeListener(mRemoveCallLogCheckChangeListener);
-                sendAutoSMSCheckBox
-                        .setOnCheckedChangeListener(mSendAutoSMSCheckChangeListener);
-            }
-            return numberList;
-        }
+	private class NumbersListAdapter extends BaseAdapter {
+		NumbersListAdapter() {
+			super();
+			mLayoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
 
-        @Override
-        public Object getItem(int position) {
-            return DataManager.getInstance().get(position);
-        }
+		@Override
+		public int getCount() {
+			return DataManager.getInstance().getSize();
+		}
 
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View numberList;
+			if (convertView == null) {
+				numberList = mLayoutInflater.inflate(R.layout.number_list,
+						parent, false);
+				View trashButton = numberList.findViewById(R.id.delete_button);
+				trashButton.setVisibility(View.GONE);
+			} else {
+				numberList = convertView;
+			}
+			numberList.setTag((Integer) position);
+			TextView alias = (TextView) numberList
+					.findViewById(R.id.alias_textview);
+			TextView number = (TextView) numberList
+					.findViewById(R.id.number_textview);
+			CheckBox rejectCallCheckBox = (CheckBox) numberList
+					.findViewById(R.id.reject_call_checkBox);
+			CheckBox removeCallLogCheckBox = (CheckBox) numberList
+					.findViewById(R.id.remove_call_log_checkBox);
+			CheckBox sendAutoSMSCheckBox = (CheckBox) numberList
+					.findViewById(R.id.send_auto_sms_checkBox);
 
-        @Override
-        public void notifyDataSetChanged() {
-            super.notifyDataSetChanged();
-        }
-    }
+			View aliasNumberLayout = numberList
+					.findViewById(R.id.aliasNumberLayout);
+			aliasNumberLayout.setOnClickListener(mNumberClickListener);
+
+			BlockSetting setting = DataManager.getInstance().get(position);
+			if (setting instanceof PatternSetting) {
+				String aliasString = setting.mAlias;
+				if (RedBoxStringUtil.isNullOrEmpty(aliasString)) {
+					aliasString = getResources().getString(
+							R.string.pattern_unnamed)
+							+ " " + position;
+				}
+				alias.setText(aliasString);
+				number.setText(R.string.pattern);
+			} else if (setting instanceof GroupRule) {
+				String aliasString = setting.mAlias;
+				if (aliasString == null || "".equals(aliasString)) {
+					aliasString = getResources().getString(
+							R.string.group_unnamed)
+							+ " " + position;
+				}
+				alias.setText(aliasString);
+				number.setText(R.string.group);
+			} else if (setting.mAlias.equals("")) {
+				alias.setText(setting.mNumber);
+				number.setText("");
+			} else {
+				alias.setText(setting.mAlias);
+				number.setText(setting.mNumber);
+			}
+			rejectCallCheckBox.setChecked(setting.mRejectCall);
+			removeCallLogCheckBox.setChecked(setting.mDeleteCallLog);
+			sendAutoSMSCheckBox.setChecked(setting.mSendAutoSMS);
+
+			if (convertView == null) {
+				rejectCallCheckBox
+						.setOnCheckedChangeListener(mRejectCallCheckChangeListener);
+				removeCallLogCheckBox
+						.setOnCheckedChangeListener(mRemoveCallLogCheckChangeListener);
+				sendAutoSMSCheckBox
+						.setOnCheckedChangeListener(mSendAutoSMSCheckChangeListener);
+			}
+			return numberList;
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return DataManager.getInstance().get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public void notifyDataSetChanged() {
+			super.notifyDataSetChanged();
+		}
+	}
 }

@@ -1,4 +1,3 @@
-
 package org.clc.android.app.redbox;
 
 import android.content.Context;
@@ -27,178 +26,198 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
 public class RedBoxHistoryActivity extends ActionBarActivity implements
-        OnHistoryChangeListener {
-    private static final String TAG = "RedBox_history";
+		OnHistoryChangeListener {
+	private static final String TAG = "RedBox_history";
 
-    private ListView mRecordsListView;
-    private View mAdView;
-    private RecordsListAdapter mAdapter;
+	private ListView mRecordsListView;
+	private View mAdView;
+	private RecordsListAdapter mAdapter;
 
-    private LayoutInflater mLayoutInflater;
+	private LayoutInflater mLayoutInflater;
 
-    private View.OnClickListener mReactionClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            final View parent = (View) v.getParent();
-            int position = (Integer) parent.getTag();
-            final ActionRecord record = DataManager.getInstance().getHistory(
-                    position);
+	private View.OnClickListener mReactionClickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			final View parent = (View) v.getParent();
+			int position = (Integer) parent.getTag();
+			final ActionRecord record = DataManager.getInstance().getHistory(
+					position);
 
-            final BlockSetting matchedRule = record.mMatchedRule;
-            final int id = DataManager.getInstance().getId(matchedRule);
-            if (id == -1) {
-                Toast.makeText(RedBoxHistoryActivity.this, R.string.can_not_find_this_rule,
-                        Toast.LENGTH_SHORT).show();
-                return;
-            }
+			final BlockSetting matchedRule = record.mMatchedRule;
+			final int id = DataManager.getInstance().getId(matchedRule);
+			if (id == -1) {
+				Toast.makeText(RedBoxHistoryActivity.this,
+						R.string.can_not_find_this_rule, Toast.LENGTH_SHORT)
+						.show();
+				return;
+			}
 
-            Intent settingIntent = new Intent();
+			Intent settingIntent = new Intent();
 
-            BlockSetting setting = DataManager.getInstance().get(id);
-            if (setting instanceof PatternSetting) {
-                settingIntent.setClass(RedBoxHistoryActivity.this,
-                        RedBoxPatternSettingActivity.class);
-            } else if (setting instanceof GroupRule) {
-                settingIntent
-                        .setClass(RedBoxHistoryActivity.this, RedBoxGroupSettingActivity.class);
-            } else {
-                settingIntent.setClass(RedBoxHistoryActivity.this,
-                        RedBoxBlockSettingActivity.class);
-            }
-            settingIntent.putExtra(RedBoxActivity.ID, id);
+			BlockSetting setting = DataManager.getInstance().get(id);
+			if (setting instanceof PatternSetting) {
+				settingIntent.setClass(RedBoxHistoryActivity.this,
+						RedBoxPatternSettingActivity.class);
+			} else if (setting instanceof GroupRule) {
+				settingIntent.setClass(RedBoxHistoryActivity.this,
+						RedBoxGroupSettingActivity.class);
+			} else {
+				settingIntent.setClass(RedBoxHistoryActivity.this,
+						RedBoxBlockSettingActivity.class);
+			}
+			settingIntent.putExtra(RedBoxActivity.ID, id);
 
-            RedBoxHistoryActivity.this.startActivity(settingIntent);
-        }
-    };
+			RedBoxHistoryActivity.this.startActivity(settingIntent);
+		}
+	};
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.history_activity_layout);
+	private View.OnClickListener mHistoryDeleteButtonClickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			final View parent = (View) v.getParent().getParent();
+			final int position = (Integer) parent.getTag();
+			DataManager.getInstance().removeHistory(position);
+			mAdapter.notifyDataSetChanged();
+			Toast.makeText(getApplicationContext(), R.string.history_deleted,
+					Toast.LENGTH_SHORT).show();
+		}
+	};
 
-        mRecordsListView = (ListView) findViewById(R.id.recordsList);
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.history_activity_layout);
 
-        mAdapter = new RecordsListAdapter();
-        mRecordsListView.setAdapter(mAdapter);
+		mRecordsListView = (ListView) findViewById(R.id.recordsList);
 
-        DataManager.getInstance().setOnHistoryChangeListener(this);
+		mAdapter = new RecordsListAdapter();
+		mRecordsListView.setAdapter(mAdapter);
 
-        mAdView = AdvertisementManager.getAdvertisementView(this);
-        LinearLayout adLayout = (LinearLayout) findViewById(R.id.advertiseLayout);
-        adLayout.addView(mAdView);
-    }
+		DataManager.getInstance().setOnHistoryChangeListener(this);
 
-    @Override
-    public void onDestroy() {
-        AdvertisementManager.destroyAd(mAdView);
-        super.onDestroy();
-    }
+		mAdView = AdvertisementManager.getAdvertisementView(this);
+		LinearLayout adLayout = (LinearLayout) findViewById(R.id.advertiseLayout);
+		adLayout.addView(mAdView);
+	}
 
-    @Override
-    public void onHistoryChanged() {
-        mAdapter.notifyDataSetChanged();
-    }
+	@Override
+	public void onDestroy() {
+		AdvertisementManager.destroyAd(mAdView);
+		super.onDestroy();
+	}
 
-    private class RecordsListAdapter extends BaseAdapter {
-        RecordsListAdapter() {
-            super();
-            mLayoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        }
+	@Override
+	public void onHistoryChanged() {
+		mAdapter.notifyDataSetChanged();
+	}
 
-        @Override
-        public int getCount() {
-            return DataManager.getInstance().getHistorySize();
-        }
+	private class RecordsListAdapter extends BaseAdapter {
+		RecordsListAdapter() {
+			super();
+			mLayoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View recordList;
-            if (convertView == null) {
-                recordList = mLayoutInflater.inflate(R.layout.record_list,
-                        parent, false);
-            } else {
-                recordList = convertView;
-            }
+		@Override
+		public int getCount() {
+			return DataManager.getInstance().getHistorySize();
+		}
 
-            final ActionRecord record = DataManager.getInstance().getHistory(
-                    position);
-            final BlockSetting rule = record.mMatchedRule;
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View recordList;
+			if (convertView == null) {
+				recordList = mLayoutInflater.inflate(R.layout.record_list,
+						parent, false);
+			} else {
+				recordList = convertView;
+			}
 
-            final TextView from = (TextView) recordList
-                    .findViewById(R.id.record_from_textView);
-            final TextView when = (TextView) recordList
-                    .findViewById(R.id.record_when_textView);
-            final TextView matchedBy = (TextView) recordList
-                    .findViewById(R.id.record_matched_by_textView);
-            final TextView rejectedCall = (TextView) recordList
-                    .findViewById(R.id.record_rejected_call_textView);
-            final TextView deletedCallLog = (TextView) recordList
-                    .findViewById(R.id.record_deleted_call_log_textView);
-            final TextView sentAutoSMS = (TextView) recordList
-                    .findViewById(R.id.record_sent_auto_sms_textView);
-            final TextView autoSMS = (TextView) recordList
-                    .findViewById(R.id.record_auto_sms_textView);
+			final ActionRecord record = DataManager.getInstance().getHistory(
+					position);
+			final BlockSetting rule = record.mMatchedRule;
 
-            from.setText(getString(R.string.record_from, rule.mNumber));
+			final TextView from = (TextView) recordList
+					.findViewById(R.id.record_from_textView);
+			final TextView when = (TextView) recordList
+					.findViewById(R.id.record_when_textView);
+			final TextView matchedBy = (TextView) recordList
+					.findViewById(R.id.record_matched_by_textView);
+			final TextView rejectedCall = (TextView) recordList
+					.findViewById(R.id.record_rejected_call_textView);
+			final TextView deletedCallLog = (TextView) recordList
+					.findViewById(R.id.record_deleted_call_log_textView);
+			final TextView sentAutoSMS = (TextView) recordList
+					.findViewById(R.id.record_sent_auto_sms_textView);
+			final TextView autoSMS = (TextView) recordList
+					.findViewById(R.id.record_auto_sms_textView);
 
-            SimpleDateFormat format = new SimpleDateFormat(
-                    "yyyy.MM.dd hh:mm:ss");
-            Timestamp timeStamp = new Timestamp(record.mTimeStamp);
-            when.setText(format.format(timeStamp));
+			from.setText(getString(R.string.record_from, rule.mNumber));
 
-            String ruleName = rule.mAlias;
-            if (!(rule instanceof PatternSetting) && !(rule instanceof GroupRule)) {
-                if (ruleName == null || "".equals(ruleName)) {
-                    ruleName = rule.mNumber;
-                }
-            }
-            if (ruleName == null || "".equals(ruleName)) {
-                final int nameResource;
-                if (rule instanceof PatternSetting) {
-                    nameResource = R.string.pattern_unnamed;
-                } else {
-                    nameResource = R.string.group_unnamed;
-                }
-                ruleName = getResources().getString(nameResource);
-            }
-            matchedBy.setText(getString(R.string.record_matched_rule, ruleName));
+			SimpleDateFormat format = new SimpleDateFormat(
+					"yyyy.MM.dd hh:mm:ss");
+			Timestamp timeStamp = new Timestamp(record.mTimeStamp);
+			when.setText(format.format(timeStamp));
 
-            if (!rule.mRejectCall) {
-                rejectedCall.setVisibility(View.GONE);
-            } else {
-                rejectedCall.setVisibility(View.VISIBLE);
-            }
+			String ruleName = rule.mAlias;
+			if (!(rule instanceof PatternSetting)
+					&& !(rule instanceof GroupRule)) {
+				if (ruleName == null || "".equals(ruleName)) {
+					ruleName = rule.mNumber;
+				}
+			}
+			if (ruleName == null || "".equals(ruleName)) {
+				final int nameResource;
+				if (rule instanceof PatternSetting) {
+					nameResource = R.string.pattern_unnamed;
+				} else {
+					nameResource = R.string.group_unnamed;
+				}
+				ruleName = getResources().getString(nameResource);
+			}
+			matchedBy
+					.setText(getString(R.string.record_matched_rule, ruleName));
 
-            if (!rule.mDeleteCallLog) {
-                deletedCallLog.setVisibility(View.GONE);
-            } else {
-                deletedCallLog.setVisibility(View.VISIBLE);
-            }
-            if (!rule.mSendAutoSMS) {
-                sentAutoSMS.setVisibility(View.GONE);
-                autoSMS.setVisibility(View.GONE);
-            } else {
-                sentAutoSMS.setVisibility(View.VISIBLE);
-                autoSMS.setVisibility(View.VISIBLE);
-                autoSMS.setText(rule.mAutoSMS);
-            }
+			if (!rule.mRejectCall) {
+				rejectedCall.setVisibility(View.GONE);
+			} else {
+				rejectedCall.setVisibility(View.VISIBLE);
+			}
 
-            recordList.setTag((Integer) position);
+			if (!rule.mDeleteCallLog) {
+				deletedCallLog.setVisibility(View.GONE);
+			} else {
+				deletedCallLog.setVisibility(View.VISIBLE);
+			}
+			if (!rule.mSendAutoSMS) {
+				sentAutoSMS.setVisibility(View.GONE);
+				autoSMS.setVisibility(View.GONE);
+			} else {
+				sentAutoSMS.setVisibility(View.VISIBLE);
+				autoSMS.setVisibility(View.VISIBLE);
+				autoSMS.setText(rule.mAutoSMS);
+			}
 
-            View reaction = recordList.findViewById(R.id.reaction_for_record);
-            reaction.setOnClickListener(mReactionClickListener);
+			recordList.setTag((Integer) position);
 
-            return recordList;
-        }
+			final View reaction = recordList
+					.findViewById(R.id.reaction_for_record);
+			reaction.setOnClickListener(mReactionClickListener);
 
-        @Override
-        public Object getItem(int position) {
-            return DataManager.getInstance().getHistory(position);
-        }
+			final View deleteButton = recordList
+					.findViewById(R.id.delete_history_button);
+			deleteButton.setOnClickListener(mHistoryDeleteButtonClickListener);
 
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-    }
+			return recordList;
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return DataManager.getInstance().getHistory(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+	}
 }

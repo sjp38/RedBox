@@ -97,4 +97,7 @@
 
     <string name="manual_dialog_message">Will show how to use this app.</string>
     <string name="manual_url">https://docs.google.com/presentation/d/1l6RAZhD2lS_2rukdi7SMdRbuvoosOwoNhFBw2zDGRZI/edit</string>
+
+    <string name="history_deleted">History deleted.</string>
+    <string name="noti_actived">\'I\'m busy, now\' is working.</string>
 </resources>

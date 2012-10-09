@@ -1,7 +1,7 @@
-
 package org.clc.android.app.redbox.data;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.TreeMap;
 
 import android.util.Log;
@@ -12,152 +12,166 @@ import android.util.Log;
  * @author sj38.park
  */
 public class BlockSettingsManager {
-    private static final String TAG = "RedBox data_blockManaging";
+	private static final String TAG = "RedBox data_blockManaging";
 
-    private TreeMap<Long, BlockSetting> mBlockSettings = new TreeMap<Long, BlockSetting>();
-    private ArrayList<OnBlockSettingChangeListener> mListeners = new ArrayList<OnBlockSettingChangeListener>();
+	private TreeMap<Long, BlockSetting> mBlockSettings = new TreeMap<Long, BlockSetting>();
+	private ArrayList<OnBlockSettingChangeListener> mListeners = new ArrayList<OnBlockSettingChangeListener>();
 
-    public BlockSettingsManager() {
-    }
+	public BlockSettingsManager() {
+	}
 
-    public void setDatas(TreeMap<Long, BlockSetting> blockSettings) {
-        mBlockSettings = blockSettings;
-    }
+	public void setDatas(TreeMap<Long, BlockSetting> blockSettings) {
+		mBlockSettings = blockSettings;
+	}
 
-    public TreeMap<Long, BlockSetting> getDatas() {
-        return mBlockSettings;
-    }
+	public TreeMap<Long, BlockSetting> getDatas() {
+		return mBlockSettings;
+	}
 
-    private static Long makeKey(final BlockSetting setting) {
-        return makeKey(setting.mParsedNumber);
-    }
+	public boolean existActiveRule() {
+		for (Map.Entry<Long, BlockSetting> entry : mBlockSettings.entrySet()) {
+			final BlockSetting setting = entry.getValue();
+			if (setting.mRejectCall || setting.mDeleteCallLog
+					|| setting.mSendAutoSMS) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-    private static Long makeKey(final String parsedNumber) {
-        return Long.parseLong(parsedNumber);
-    }
+	private static Long makeKey(final BlockSetting setting) {
+		return makeKey(setting.mParsedNumber);
+	}
 
-    public int getSize() {
-        return mBlockSettings.size();
-    }
+	private static Long makeKey(final String parsedNumber) {
+		return Long.parseLong(parsedNumber);
+	}
 
-    private Long getKeyForId(int id) {
-        final Long[] keys = mBlockSettings.keySet().toArray(new Long[0]);
-        return keys[id];
-    }
+	public int getSize() {
+		return mBlockSettings.size();
+	}
 
-    public BlockSetting get(int id) {
-        if (id >= mBlockSettings.size()) {
-            return null;
-        }
-        final Long key = getKeyForId(id);
-        return mBlockSettings.get(key);
-    }
+	private Long getKeyForId(int id) {
+		final Long[] keys = mBlockSettings.keySet().toArray(new Long[0]);
+		return keys[id];
+	}
 
-    public BlockSetting get(String parsedNumber) {
-        final Long key = makeKey(parsedNumber);
-        return mBlockSettings.get(key);
-    }
+	public BlockSetting get(int id) {
+		if (id >= mBlockSettings.size()) {
+			return null;
+		}
+		final Long key = getKeyForId(id);
+		return mBlockSettings.get(key);
+	}
 
-    public boolean isExist(BlockSetting setting) {
-        final Long key = makeKey(setting);
-        return isExist(key);
-    }
+	public BlockSetting get(String parsedNumber) {
+		final Long key = makeKey(parsedNumber);
+		return mBlockSettings.get(key);
+	}
 
-    public boolean isExist(String parsedNumber) {
-        final Long key = makeKey(parsedNumber);
-        return isExist(key);
-    }
+	public boolean isExist(BlockSetting setting) {
+		final Long key = makeKey(setting);
+		return isExist(key);
+	}
 
-    private boolean isExist(Long key) {
-        return mBlockSettings.get(key) != null;
-    }
+	public boolean isExist(String parsedNumber) {
+		final Long key = makeKey(parsedNumber);
+		return isExist(key);
+	}
 
-    public boolean add(BlockSetting setting) {
-        Log.d(TAG, "add " + setting.toString());
-        Long key = makeKey(setting);
-        if (isExist(key)) {
-            return false;
-        }
-        mBlockSettings.put(key, setting);
-        notifyDataChanged();
-        return true;
-    }
+	private boolean isExist(Long key) {
+		return mBlockSettings.get(key) != null;
+	}
 
-    private void remove(final Long key) {
-        mBlockSettings.remove(key);
-        notifyDataChanged();
-    }
+	public boolean add(BlockSetting setting) {
+		Log.d(TAG, "add " + setting.toString());
+		Long key = makeKey(setting);
+		if (isExist(key)) {
+			return false;
+		}
+		mBlockSettings.put(key, setting);
+		notifyDataChanged();
+		return true;
+	}
 
-    public void remove(final int id) {
-        final Long key = getKeyForId(id);
-        remove(key);
-    }
+	private void remove(final Long key) {
+		mBlockSettings.remove(key);
+		notifyDataChanged();
+	}
 
-    public void remove(final BlockSetting setting) {
-        final Long key = makeKey(setting);
-        remove(key);
-    }
+	public void remove(final int id) {
+		final Long key = getKeyForId(id);
+		remove(key);
+	}
 
-    private void notifyDataChanged() {
-        for (OnBlockSettingChangeListener listener : mListeners) {
-            listener.onBlockSettingsChanged();
-        }
-    }
+	public void remove(final BlockSetting setting) {
+		final Long key = makeKey(setting);
+		remove(key);
+	}
 
-    private BlockSetting getValueForId(final int id) {
-        final Long key = getKeyForId(id);
-        return mBlockSettings.get(key);
-    }
+	private void notifyDataChanged() {
+		for (OnBlockSettingChangeListener listener : mListeners) {
+			listener.onBlockSettingsChanged();
+		}
+	}
 
-    public void update(final int id, final BlockSetting setting) {
-        final BlockSetting originalSetting = getValueForId(id);
-        final Long oldKey = makeKey(originalSetting.mParsedNumber);
-        mBlockSettings.remove(oldKey);
+	private BlockSetting getValueForId(final int id) {
+		final Long key = getKeyForId(id);
+		return mBlockSettings.get(key);
+	}
 
-        Long key = makeKey(setting.mParsedNumber);
-        mBlockSettings.put(key, setting);
-        notifyDataChanged();
-    }
+	public void update(final int id, final BlockSetting setting) {
+		final BlockSetting originalSetting = getValueForId(id);
+		final Long oldKey = makeKey(originalSetting.mParsedNumber);
+		mBlockSettings.remove(oldKey);
 
-    public void updateRejectCall(int id, boolean reject) {
-        final Long key = getKeyForId(id);
-        final BlockSetting setting = mBlockSettings.get(key);
-        setting.mRejectCall = reject;
-    }
+		Long key = makeKey(setting.mParsedNumber);
+		mBlockSettings.put(key, setting);
+		notifyDataChanged();
+	}
 
-    public void updateDeleteCallLog(int id, boolean deleteCallLog) {
-        final Long key = getKeyForId(id);
-        final BlockSetting setting = mBlockSettings.get(key);
-        setting.mDeleteCallLog = deleteCallLog;
-    }
+	public void updateRejectCall(int id, boolean reject) {
+		final Long key = getKeyForId(id);
+		final BlockSetting setting = mBlockSettings.get(key);
+		setting.mRejectCall = reject;
+		notifyDataChanged();
+	}
 
-    public void updateSendAutoSMS(int id, boolean sendAutoSMS) {
-        final Long key = getKeyForId(id);
-        final BlockSetting setting = mBlockSettings.get(key);
-        setting.mSendAutoSMS = sendAutoSMS;
-    }
+	public void updateDeleteCallLog(int id, boolean deleteCallLog) {
+		final Long key = getKeyForId(id);
+		final BlockSetting setting = mBlockSettings.get(key);
+		setting.mDeleteCallLog = deleteCallLog;
+		notifyDataChanged();
+	}
 
-    public void setOnBlockSettingChangeListener(
-            OnBlockSettingChangeListener listener) {
-        if (mListeners == null) {
-            mListeners = new ArrayList<OnBlockSettingChangeListener>();
-        }
-        mListeners.add(listener);
-    }
-    
-    public int getId(BlockSetting rule) {
-        final Long searchingKey = makeKey(rule.mParsedNumber);
-        final Long[] keys = mBlockSettings.keySet().toArray(new Long[0]);
-        
-        for (int i=0 ; i <keys.length; i++) {
-            if (keys[i].equals(searchingKey)) {
-                return i;
-            }
-        }
-        return -1;
-    }
+	public void updateSendAutoSMS(int id, boolean sendAutoSMS) {
+		final Long key = getKeyForId(id);
+		final BlockSetting setting = mBlockSettings.get(key);
+		setting.mSendAutoSMS = sendAutoSMS;
+		notifyDataChanged();
+	}
 
-    public static interface OnBlockSettingChangeListener {
-        void onBlockSettingsChanged();
-    }
+	public void setOnBlockSettingChangeListener(
+			OnBlockSettingChangeListener listener) {
+		if (mListeners == null) {
+			mListeners = new ArrayList<OnBlockSettingChangeListener>();
+		}
+		mListeners.add(listener);
+	}
+
+	public int getId(BlockSetting rule) {
+		final Long searchingKey = makeKey(rule.mParsedNumber);
+		final Long[] keys = mBlockSettings.keySet().toArray(new Long[0]);
+
+		for (int i = 0; i < keys.length; i++) {
+			if (keys[i].equals(searchingKey)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	public static interface OnBlockSettingChangeListener {
+		void onBlockSettingsChanged();
+	}
 }
