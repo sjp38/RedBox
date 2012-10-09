@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.clc.android.app.redbox"
     android:debuggable="false"
-    android:versionCode="11"
+    android:versionCode="12"
     android:versionName="1.0.3.0" >
 
     <uses-sdk android:minSdkVersion="8" />
