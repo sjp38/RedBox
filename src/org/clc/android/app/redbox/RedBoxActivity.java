@@ -256,21 +256,18 @@ public class RedBoxActivity extends ActionBarActivity implements
 	public void onBlockSettingsChanged() {
 		mAdapter.notifyDataSetChanged();
 		showNotificationIfActive();
-		android.util.Log.d("sj38.park_test", "bbb");
 	}
 
 	@Override
 	public void onPatternSettingsChanged() {
 		mAdapter.notifyDataSetChanged();
 		showNotificationIfActive();
-		android.util.Log.d("sj38.park_test", "ccc");
 	}
 
 	@Override
 	public void onGroupRulesChanged() {
 		mAdapter.notifyDataSetChanged();
 		showNotificationIfActive();
-		android.util.Log.d("sj38.park_test", "aaa");
 	}
 
 	private void showNotificationIfActive() {
